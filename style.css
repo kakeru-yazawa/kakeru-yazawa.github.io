@@ -1,15 +1,14 @@
 :root {
-  /* アクセント色（ティール。インディゴは #3b4a8c） */
-  --accent: #1f5f6b;
-  /* 所属の縦線にだけ使う大学の色 */
-  --waseda: #8e1b2f;
+  /* 筑波の紫と早稲田の臙脂。リンクなどの単色は筑波の紫 */
   --tsukuba: #6b3d91;
+  --waseda: #8e1b2f;
+  --accent: var(--tsukuba);
+  /* 名前・最上部のライン・CVボタン用のグラデーション */
+  --gradient: linear-gradient(90deg, var(--tsukuba) 25%, var(--waseda) 75%);
 
   --bg: #fbfaf8;
   --surface: #ffffff;
   --text: #1c1b1f;
-  /* 名前用：ティールに寄せた深い緑がかったグレー */
-  --name: #2f4146;
   --muted: #6b6870;
   --border: #e6e3e8;
 }
@@ -39,7 +38,7 @@ body::before {
   content: "";
   display: block;
   height: 4px;
-  background: var(--accent);
+  background: var(--gradient);
 }
 
 .page {
@@ -57,9 +56,12 @@ body::before {
 h1 {
   width: fit-content;
   margin: 0;
-  color: var(--name);
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   font-size: clamp(32px, 7vw, 42px);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.02em;
 }
@@ -67,7 +69,10 @@ h1 {
 .name-ja {
   width: fit-content;
   margin: 8px 0 0;
-  color: var(--name);
+  background: var(--gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   font-size: 18px;
   font-weight: 500;
   letter-spacing: 0.1em;
@@ -184,7 +189,7 @@ h2 {
   gap: 8px;
   height: 44px;
   padding: 0 22px 0 18px;
-  background: var(--accent);
+  background: var(--gradient);
   border-radius: 999px;
   color: #fff;
   font-weight: 500;
