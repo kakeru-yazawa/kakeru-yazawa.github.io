@@ -128,6 +128,34 @@ h2 {
   border-left: 1px solid var(--border);
 }
 
+.contact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  font-size: 15px;
+}
+
+.contact svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.contact a {
+  color: var(--tsukuba);
+  text-decoration: none;
+}
+
+.contact a:hover {
+  text-decoration: underline;
+}
+
 /* ---------- CV + Socials ---------- */
 
 .actions {
