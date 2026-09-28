@@ -54,7 +54,7 @@ body::before {
 h1 {
   width: fit-content;
   margin: 0;
-  font-size: clamp(40px, 9vw, 56px);
+  font-size: clamp(32px, 7vw, 42px);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -71,7 +71,7 @@ h1 {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 500;
   letter-spacing: 0.1em;
 }
@@ -100,12 +100,6 @@ h2 {
   text-transform: uppercase;
 }
 
-h2 span + span::before {
-  content: "/";
-  margin: 0 8px;
-  opacity: 0.5;
-}
-
 .section p {
   margin: 0;
 }
@@ -117,7 +111,7 @@ h2 span + span::before {
   gap: 40px;
 }
 
-.bilingual p + p {
+.bilingual > div + div {
   padding-left: 20px;
   margin-left: -20px;
   border-left: 1px solid var(--border);
@@ -238,10 +232,10 @@ h2 span + span::before {
 @media (max-width: 720px) {
   .bilingual {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 28px;
   }
 
-  .bilingual p + p {
+  .bilingual > div + div {
     padding-left: 0;
     margin-left: 0;
     border-left: 0;
