@@ -221,6 +221,11 @@ h2 span + span::before {
   color: #1f7fc4;
 }
 
+.social-trios:hover,
+.social-trios:focus-visible {
+  color: var(--tsukuba);
+}
+
 /* ---------- Footer ---------- */
 
 .footer {
