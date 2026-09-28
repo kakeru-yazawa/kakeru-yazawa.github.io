@@ -4,7 +4,7 @@
   --waseda: #8e1b2f;
   --accent: var(--tsukuba);
   /* 名前・最上部のライン・CVボタン用のグラデーション */
-  --gradient: linear-gradient(90deg, var(--tsukuba) 25%, var(--waseda) 75%);
+  --gradient: linear-gradient(90deg, var(--waseda) 25%, var(--tsukuba) 75%);
 
   --bg: #fbfaf8;
   --surface: #ffffff;
