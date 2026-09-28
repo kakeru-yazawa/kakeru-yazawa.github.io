@@ -1,8 +1,9 @@
 :root {
-  /* 筑波の紫 → 早稲田の臙脂（半々） */
+  /* アクセント色（ティール。インディゴは #3b4a8c） */
+  --accent: #1f5f6b;
+  /* 所属の縦線にだけ使う大学の色 */
   --waseda: #8e1b2f;
   --tsukuba: #6b3d91;
-  --accent: linear-gradient(90deg, var(--tsukuba) 25%, var(--waseda) 75%);
 
   --bg: #fbfaf8;
   --surface: #ffffff;
@@ -31,7 +32,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ページ最上部の細いグラデーションライン */
+/* ページ最上部の細いライン */
 body::before {
   content: "";
   display: block;
@@ -54,23 +55,17 @@ body::before {
 h1 {
   width: fit-content;
   margin: 0;
+  color: var(--accent);
   font-size: clamp(32px, 7vw, 42px);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.02em;
-  background: var(--accent);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 
 .name-ja {
   width: fit-content;
   margin: 8px 0 0;
-  background: var(--accent);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--accent);
   font-size: 18px;
   font-weight: 500;
   letter-spacing: 0.1em;
@@ -84,7 +79,7 @@ h1 {
   line-height: 1.6;
 }
 
-/* 所属ごとに色の縦線：筑波は紫、早稲田は臙脂 */
+/* 所属の左の縦線：筑波は紫、早稲田は臙脂 */
 .affiliation {
   padding-left: 12px;
   border-left: 3px solid var(--border);
@@ -120,7 +115,7 @@ h2 {
 }
 
 .section a {
-  color: var(--tsukuba);
+  color: var(--accent);
   text-underline-offset: 3px;
 }
 
@@ -163,7 +158,7 @@ h2 {
 }
 
 .contact a {
-  color: var(--tsukuba);
+  color: var(--accent);
   text-decoration: none;
 }
 
@@ -209,7 +204,7 @@ h2 {
 .cv-button:hover,
 .cv-button:focus-visible {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px -6px var(--waseda);
+  box-shadow: 0 6px 16px -6px var(--accent);
 }
 
 .socials {
@@ -271,7 +266,7 @@ h2 {
 
 .social-trios:hover,
 .social-trios:focus-visible {
-  color: var(--tsukuba);
+  color: var(--accent);
 }
 
 /* ---------- Footer ---------- */
