@@ -104,6 +104,17 @@ h2 {
   margin: 0;
 }
 
+.section a {
+  color: var(--tsukuba);
+  text-underline-offset: 3px;
+}
+
+.section .note {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 /* 英語と日本語の段落：PCでは左右、スマホでは縦に並べる */
 .bilingual {
   display: grid;
