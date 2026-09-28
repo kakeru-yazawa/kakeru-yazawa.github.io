@@ -231,19 +231,9 @@ h2 span + span::before {
   color: #00ccbb;
 }
 
-.social-orcid:hover,
-.social-orcid:focus-visible {
-  color: #a6ce39;
-}
-
 .social-researchmap:hover,
 .social-researchmap:focus-visible {
   color: #1f7fc4;
-}
-
-.social-trios:hover,
-.social-trios:focus-visible {
-  color: var(--tsukuba);
 }
 
 /* ---------- Footer ---------- */
