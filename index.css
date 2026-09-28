@@ -1,168 +1,262 @@
-@charset "UTF-8";
+:root {
+  /* 早稲田の臙脂 → 筑波の紫（紫を多めに） */
+  --waseda: #8e1b2f;
+  --tsukuba: #6b3d91;
+  --accent: linear-gradient(90deg, var(--waseda), var(--tsukuba) 40%);
+
+  --bg: #fbfaf8;
+  --surface: #ffffff;
+  --text: #1c1b1f;
+  --muted: #6b6870;
+  --border: #e6e3e8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --waseda: #d9667a;
+    --tsukuba: #b38ad6;
+
+    --bg: #141316;
+    --surface: #1d1c20;
+    --text: #ecebef;
+    --muted: #a09ca6;
+    --border: #2f2d33;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-	margin: 0;
-	padding: 0;
-	font-family: "游ゴシック Medium", "ヒラギノ角ゴ Pro", "Hiragino Kaku Gothic Pro", "メイリオ", "Meiryo", sans-serif;
-	line-height: 1.6;
-    font-size: 16px;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Inter", "Noto Sans JP", "Hiragino Sans", "Yu Gothic Medium", YuGothic, sans-serif;
+  font-size: 16px;
+  line-height: 1.8;
+  -webkit-font-smoothing: antialiased;
 }
-#header-container {
+
+/* ページ最上部の細いグラデーションライン */
+body::before {
+  content: "";
+  display: block;
+  height: 4px;
+  background: var(--accent);
+}
+
+.page {
+  max-width: 760px;
   margin: 0 auto;
-  width: 694px;
+  padding: 0 20px;
 }
-header {
-	background-color: #214555;
-}
-#head-inner {
-    padding: 25px 0;
-}
-h1 {
-	font-size: 26px;
-	font-weight: bold;
-	padding: 10px 0 0 0;
-	margin: 0;
-	color: #f3e6d2;
-}
-h1 a {
-	font-weight: bold;
-	color: #f3e6d2;
-	text-decoration: none;
-}
-h1 a:hover {
-	color: #e8f3f9;
-	text-decoration: none;
-}
-.description {
-	line-height: 1.2;
-	color: #f3f2eb;
-	margin: 0.5em 0 1em 0;
-}
-h2 {
-	font-size: 22px;
-	margin: 0;
-	padding: 4px 0;
-	border-bottom: 1px solid #999;
-}
-#content-wrapper {margin: 0 auto;
-    width: 694px;}
-main {
-	color: #333;
-}
-#inner {
-	padding: 20px 0 0 0;
-}
-ul {
-	margin: 0 0 0 1em;
-	padding: 0;
-}
-li {
-	list-style: disc;
-}
-p {
-	margin: 1em 0;
-}
-img {
-	max-width: 100%;
-	height: auto;
-	border: 0;
-}
-hr {
-	border-width: 1px 0 0 0;
-	border-style: solid;
-	border-color: #ccc;
-	height: 1px;
-}
-a {
-	font-weight: normal;
-}
-aside {
 
-}
-#middle-inner {
-	padding: 20px 0 20px 0;
-}
-.side-title {
-	padding: 7px 16px 7px 16px;
-	background-color: #f1f1f1;
-	color: #333;
-	font-weight: bold;
-	border: 1px solid #ccc;
-	margin-bottom: 10px;
-	border-radius: 5px;
-}
-.side {
-	margin: 0 0 10px 0;
-	padding: 2px 8px 8px 7px;
-	background-color: #fcfcfc;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-	border-radius: 5px;
-}
-.side ul {
-	margin: 0 0 0 10px;
-	padding: 0;
-}
-.side li {
-	list-style: none;
-	margin-bottom: 0.5em;
-}
-.side li a {
-	text-decoration: none;
-	color: #214555;
-}
-.side li a:hover {
-	text-decoration: underline;
-}
-footer {
-	font-size: 15px;
-	height: 100px;
-	clear: both;
-	text-align: center;
-}
-blockquote {
-	border: 1px solid #ccc;
-	padding: 5px;
-	margin: 10px;
-}
-@media screen and (max-width: 767px) {
-#header-container {
-    margin: 0;
-	width: 100%;
-}
-header {
+/* ---------- Hero ---------- */
 
+.hero {
+  padding: 96px 0 56px;
 }
-#head-inner {
-    padding: 25px 10px;
-	background-color: #214555;
-}
-.description {
-}
-#content-wrapper {
-margin: 0;
-	width: 100%;}
-main {
-width: 100%;
-	color: #333;
-}
-#inner {
-	padding: 20px 10px 0 10px;
-}
-aside {
-width: 100%;
-}
-#middle-inner {
-	padding: 10px 10px 20px 10px;
-}
+
 h1 {
-	font-size: 20px;
+  width: fit-content;
+  margin: 0;
+  font-size: clamp(40px, 9vw, 56px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  background: var(--accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
+
+.name-ja {
+  width: fit-content;
+  margin: 8px 0 0;
+  background: var(--accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+
+.affiliation {
+  display: flex;
+  flex-direction: column;
+  margin: 20px 0 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* ---------- Sections ---------- */
+
+.section {
+  padding: 40px 0;
+  border-top: 1px solid var(--border);
+}
+
 h2 {
-	font-size: 18px;
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
-h3 {
-	font-size: 16px;
+
+h2 span + span::before {
+  content: "/";
+  margin: 0 8px;
+  opacity: 0.5;
 }
-h4 {
-	font-size: 14px;
+
+.section p {
+  margin: 0;
 }
+
+/* 英語と日本語の段落：PCでは左右、スマホでは縦に並べる */
+.bilingual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+}
+
+.bilingual p + p {
+  padding-left: 20px;
+  margin-left: -20px;
+  border-left: 1px solid var(--border);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tags li {
+  display: flex;
+  gap: 6px;
+  padding: 2px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.tags li span + span {
+  opacity: 0.7;
+}
+
+/* ---------- Socials ---------- */
+
+.socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.social {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  color: var(--muted);
+  transition: color 0.2s, border-color 0.2s, transform 0.2s;
+}
+
+.social svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.social:hover,
+.social:focus-visible {
+  border-color: currentColor;
+  transform: translateY(-2px);
+}
+
+.social svg.stroke {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ホバーで各サービスのブランドカラーに */
+.social-scholar:hover,
+.social-scholar:focus-visible {
+  color: #4285f4;
+}
+
+.social-researchgate:hover,
+.social-researchgate:focus-visible {
+  color: #00ccbb;
+}
+
+.social-orcid:hover,
+.social-orcid:focus-visible {
+  color: #a6ce39;
+}
+
+.social-researchmap:hover,
+.social-researchmap:focus-visible {
+  color: #1f7fc4;
+}
+
+.social-github:hover,
+.social-github:focus-visible {
+  color: var(--text);
+}
+
+.social-trios:hover,
+.social-trios:focus-visible {
+  color: var(--tsukuba);
+}
+
+/* ---------- Footer ---------- */
+
+.footer {
+  padding: 40px 0 56px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 720px) {
+  .bilingual {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .bilingual p + p {
+    padding-left: 0;
+    margin-left: 0;
+    border-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero {
+    padding: 64px 0 40px;
+  }
 }
