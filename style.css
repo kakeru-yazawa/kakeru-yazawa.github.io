@@ -86,17 +86,6 @@ h1 {
   line-height: 1.6;
 }
 
-/* 所属の左の縦線 */
-.affiliation {
-  padding-left: 12px;
-  border-left: 3px solid var(--border);
-}
-
-.affiliation-tsukuba {
-  border-left-color: var(--tsukuba);
-}
-
-
 /* ---------- Sections ---------- */
 
 .section {
