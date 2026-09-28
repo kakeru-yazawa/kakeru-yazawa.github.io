@@ -150,7 +150,7 @@ h2 {
 }
 
 .contact .email {
-  color: var(--text);
+  color: var(--muted);
   font-weight: 600;
 }
 
