@@ -86,7 +86,7 @@ h1 {
   line-height: 1.6;
 }
 
-/* 所属の左の縦線：筑波は紫、早稲田は臙脂 */
+/* 所属の左の縦線 */
 .affiliation {
   padding-left: 12px;
   border-left: 3px solid var(--border);
@@ -96,10 +96,6 @@ h1 {
   border-left-color: var(--tsukuba);
 }
 
-.affiliation-waseda {
-  margin-top: 12px;
-  border-left-color: var(--waseda);
-}
 
 /* ---------- Sections ---------- */
 
