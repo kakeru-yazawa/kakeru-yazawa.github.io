@@ -200,6 +200,11 @@ h2 span + span::before {
   color: #1f7fc4;
 }
 
+.social-cv:hover,
+.social-cv:focus-visible {
+  color: var(--waseda);
+}
+
 .social-trios:hover,
 .social-trios:focus-visible {
   color: var(--tsukuba);
