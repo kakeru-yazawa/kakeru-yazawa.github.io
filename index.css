@@ -3,27 +3,12 @@
   --waseda: #8e1b2f;
   --tsukuba: #6b3d91;
   --accent: linear-gradient(90deg, var(--waseda) 25%, var(--tsukuba) 75%);
-  /* 白文字を載せるボタン用。ダークモードでも濃い色のまま */
-  --accent-strong: linear-gradient(90deg, #8e1b2f 25%, #6b3d91 75%);
 
   --bg: #fbfaf8;
   --surface: #ffffff;
   --text: #1c1b1f;
   --muted: #6b6870;
   --border: #e6e3e8;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --waseda: #d9667a;
-    --tsukuba: #b38ad6;
-
-    --bg: #141316;
-    --surface: #1d1c20;
-    --text: #ecebef;
-    --muted: #a09ca6;
-    --border: #2f2d33;
-  }
 }
 
 *,
@@ -154,7 +139,7 @@ h2 span + span::before {
   gap: 8px;
   height: 44px;
   padding: 0 22px 0 18px;
-  background: var(--accent-strong);
+  background: var(--accent);
   border-radius: 999px;
   color: #fff;
   font-weight: 500;
@@ -176,7 +161,7 @@ h2 span + span::before {
 .cv-button:hover,
 .cv-button:focus-visible {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px -6px #6b3d91;
+  box-shadow: 0 6px 16px -6px var(--tsukuba);
 }
 
 .socials {
