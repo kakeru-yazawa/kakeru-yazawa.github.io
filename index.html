@@ -56,11 +56,11 @@
   <section class="section bilingual">
     <div lang="en">
       <h2>About</h2>
-      <p>I'm an L2 phonetician/phonologist. My research mainly focuses on Japanese learners of English and learners of Japanese from diverse language backgrounds, using methods such as speech corpora, perceptual simulations, and AI models (speech recognition and synthesis).</p>
+      <p>I'm an L2 phonetician and phonologist. I mainly study Japanese learners of English and learners of Japanese from diverse language backgrounds, drawing on speech corpora, perceptual simulations, and AI models for speech recognition and synthesis, among other approaches.</p>
     </div>
     <div>
       <h2>自己紹介</h2>
-      <p>第二言語の音声学・音韻論を専門としています。主に日本語母語の英語学習者や多言語母語の日本語学習者を対象に、発話コーパス・知覚シミュレーション・AIモデル（音声認識・音声合成）などの手法を用いて研究を行っています。</p>
+      <p>第二言語の音声学・音韻論が専門です。主に日本語母語の英語学習者や多言語母語の日本語学習者を対象に、発話コーパス・知覚シミュレーション・AIモデル（音声認識・音声合成）等を通して研究を行っています。</p>
     </div>
   </section>
 
@@ -72,7 +72,7 @@
     </div>
     <div>
       <h2>学生指導</h2>
-      <p>大学院生の研究指導は<a href="https://linguistics.hass.tsukuba.ac.jp/">筑波大学 人文学学位プログラム 言語学サブプログラム</a>で行なっています。受入を希望される場合はお問い合わせください。</p>
+      <p>大学院生の研究指導は<a href="https://linguistics.hass.tsukuba.ac.jp/">筑波大学 人文学学位プログラム 言語学サブプログラム</a>で行なっています。受け入れを希望される場合はお問い合わせください。</p>
       <p class="note">※修士課程および博士課程に進学するには大学院入試（対面実施）に合格する必要があります。</p>
     </div>
   </section>
@@ -83,10 +83,7 @@
   // メールアドレスを表示時に組み立てる（HTML に @ 付きのアドレスを直接書かないため）
   document.querySelectorAll(".email").forEach(function (el) {
     var address = ["yazawa.kakeru.gb", "u.tsukuba.ac.jp"].join("@");
-    var link = document.createElement("a");
-    link.href = "mailto:" + address;
-    link.textContent = address;
-    el.replaceChildren(link);
+    el.textContent = address;
   });
 </script>
 </body>
