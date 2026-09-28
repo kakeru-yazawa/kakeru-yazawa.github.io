@@ -1,8 +1,8 @@
 :root {
-  /* 早稲田の臙脂 → 筑波の紫（半々） */
+  /* 筑波の紫 → 早稲田の臙脂（半々） */
   --waseda: #8e1b2f;
   --tsukuba: #6b3d91;
-  --accent: linear-gradient(90deg, var(--waseda) 25%, var(--tsukuba) 75%);
+  --accent: linear-gradient(90deg, var(--tsukuba) 25%, var(--waseda) 75%);
 
   --bg: #fbfaf8;
   --surface: #ffffff;
@@ -84,9 +84,19 @@ h1 {
   line-height: 1.6;
 }
 
-.affiliation-sub {
-  margin-top: 10px;
-  font-size: 14px;
+/* 所属ごとに色の縦線：筑波は紫、早稲田は臙脂 */
+.affiliation {
+  padding-left: 12px;
+  border-left: 3px solid var(--border);
+}
+
+.affiliation-tsukuba {
+  border-left-color: var(--tsukuba);
+}
+
+.affiliation-waseda {
+  margin-top: 12px;
+  border-left-color: var(--waseda);
 }
 
 /* ---------- Sections ---------- */
@@ -199,7 +209,7 @@ h2 {
 .cv-button:hover,
 .cv-button:focus-visible {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px -6px var(--tsukuba);
+  box-shadow: 0 6px 16px -6px var(--waseda);
 }
 
 .socials {
