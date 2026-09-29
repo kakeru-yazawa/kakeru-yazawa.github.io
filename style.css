@@ -295,12 +295,63 @@ h2 {
   text-decoration-color: currentColor;
 }
 
-.section .pub-source {
-  margin: 0 0 8px;
+.pubs .doi {
+  color: var(--muted);
+  overflow-wrap: anywhere;
 }
 
 .pub-year {
-  margin: 32px 0 12px;
+  margin: 0 0 12px;
+}
+
+.pub-group:not([hidden]) ~ .pub-group:not([hidden]) {
+  margin-top: 32px;
+}
+
+.pub-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 32px;
+}
+
+.pub-filters[hidden] {
+  display: none;
+}
+
+.pub-filters button {
+  padding: 6px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.pub-filters button:hover,
+.pub-filters button:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.pub-filters button[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.pub-filters .ja {
+  margin-left: 2px;
+  font-size: 12px;
+}
+
+.pub-filters .count {
+  margin-left: 2px;
+  opacity: 0.7;
+  font-size: 12px;
 }
 
 /* ---------- Footer ---------- */
