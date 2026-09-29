@@ -24,6 +24,7 @@ END = "<!-- researchmap:end -->"
 MY_NAMES = {"Kakeru Yazawa", "Yazawa Kakeru", "矢澤 翔", "矢澤翔"}
 PAGE_SIZE = 100
 IN_PRESS = "In press"
+IN_PRESS_HEADING = 'In press <span lang="ja">印刷中</span>'
 
 
 def fetch_all(achievement_type):
@@ -246,7 +247,8 @@ def render(items):
         if y != year:
             if year is not None:
                 out.append("    </ol></div>\n")
-            out.append(f'    <div class="pub-group">\n    <h2 class="pub-year">{y}</h2>\n    <ol class="pubs">\n')
+            heading = IN_PRESS_HEADING if y == IN_PRESS else y
+            out.append(f'    <div class="pub-group">\n    <h2 class="pub-year">{heading}</h2>\n    <ol class="pubs">\n')
             year = y
         out.append(render_item(it))
     if year is not None:

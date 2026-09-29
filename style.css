@@ -338,8 +338,8 @@ h2 {
 }
 
 .pub-filters button[aria-pressed="true"] {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--gradient);
+  border-color: transparent;
   color: #fff;
 }
 
