@@ -1,1 +1,0 @@
-# kakeru-yazawa.github.io
