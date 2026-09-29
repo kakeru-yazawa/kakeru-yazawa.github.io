@@ -295,8 +295,12 @@ h2 {
   text-decoration-color: currentColor;
 }
 
-.section .pubs + .note {
-  margin-top: 32px;
+.section .pub-source {
+  margin: 0 0 8px;
+}
+
+.pub-year {
+  margin: 32px 0 12px;
 }
 
 /* ---------- Footer ---------- */
