@@ -3,7 +3,7 @@
   --tsukuba: #6b3d91;
   --waseda: #8e1b2f;
   --accent: var(--tsukuba);
-  /* Gradient for the name, the top line and the CV button */
+  /* Gradient for the name and the top line */
   --gradient: linear-gradient(90deg, var(--waseda) 25%, var(--tsukuba) 75%);
 
   --bg: #fbfaf8;
@@ -191,7 +191,7 @@ h2 {
   font-weight: 600;
 }
 
-/* ---------- CV + Socials ---------- */
+/* ---------- Socials ---------- */
 
 .actions {
   display: flex;
@@ -200,38 +200,6 @@ h2 {
   gap: 16px 20px;
   margin: 28px 0 0;
 }
-
-.cv-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 44px;
-  padding: 0 22px 0 18px;
-  background: var(--gradient);
-  border-radius: 999px;
-  color: #fff;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-decoration: none;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.cv-button svg {
-  width: 18px;
-  height: 18px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.cv-button:hover,
-.cv-button:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px -6px var(--accent);
-}
-
 
 .socials {
   display: flex;
