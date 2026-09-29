@@ -1,9 +1,11 @@
 """Rebuild the publication list in publications.html from researchmap.
 
 Usage:
-  python .github/scripts/update_publications.py            # fetch from the researchmap API
-  python .github/scripts/update_publications.py data.json  # use a saved API response instead
+  python .github/scripts/update_publications.py              # fetch from the researchmap API
+  python .github/scripts/update_publications.py a.json b.json # use saved API responses instead
 
+Papers (published_papers) and books/chapters (books_etc) are merged and grouped by year.
+Book editors are read from an "Editor: ..." or "Editors: ..." line in the description (概要).
 Only the part of publications.html between the researchmap markers is replaced.
 """
 
@@ -15,18 +17,20 @@ import urllib.request
 from pathlib import Path
 
 PERMALINK = "kakeruyazawa"
-API = f"https://api.researchmap.jp/{PERMALINK}/published_papers"
+TYPES = ["published_papers", "books_etc"]
 PAGE = Path(__file__).resolve().parents[2] / "publications.html"
 START = "<!-- researchmap:start -->"
 END = "<!-- researchmap:end -->"
 MY_NAMES = {"Kakeru Yazawa", "Yazawa Kakeru", "矢澤 翔", "矢澤翔"}
 PAGE_SIZE = 100
+IN_PRESS = "In press"
 
 
-def fetch_all():
+def fetch_all(achievement_type):
     items, start = [], 1
     while True:
-        url = f"{API}?format=json&limit={PAGE_SIZE}&start={start}"
+        url = (f"https://api.researchmap.jp/{PERMALINK}/{achievement_type}"
+               f"?format=json&limit={PAGE_SIZE}&start={start}")
         req = urllib.request.Request(url, headers={"Accept": "application/json"})
         with urllib.request.urlopen(req, timeout=60) as res:
             data = json.load(res)
@@ -45,8 +49,12 @@ def pick(field):
     return field.get("en") or field.get("ja") or ""
 
 
+def esc(text):
+    return html.escape(text or "")
+
+
 def join_authors(names):
-    names = [f"<b>{html.escape(n)}</b>" if n in MY_NAMES else html.escape(n) for n in names]
+    names = [f"<b>{esc(n)}</b>" if n in MY_NAMES else esc(n) for n in names]
     if len(names) <= 1:
         return "".join(names)
     if len(names) == 2:
@@ -54,42 +62,87 @@ def join_authors(names):
     return ", ".join(names[:-1]) + f", &amp; {names[-1]}"
 
 
-def render_item(it):
-    authors = (it.get("authors") or {}).get("en") or (it.get("authors") or {}).get("ja") or []
-    year = (it.get("publication_date") or "")[:4]
-    title = html.escape(pick(it.get("paper_title")))
+def year_of(it):
+    return (it.get("publication_date") or "")[:4] or IN_PRESS
+
+
+def linked(text, it):
     doi = ((it.get("identifiers") or {}).get("doi") or [None])[0]
     if doi:
-        title = f'<a href="https://doi.org/{html.escape(doi)}">{title}</a>'
+        return f'<a href="https://doi.org/{esc(doi)}">{text}</a>'
+    return text
 
-    source = f"<i>{html.escape(pick(it.get('publication_name')))}</i>"
-    vol, num = it.get("volume"), it.get("number")
-    if vol:
-        source += f", <i>{html.escape(vol)}</i>"
-        if num:
-            source += f"({html.escape(num)})"
-    sp, ep = it.get("starting_page"), it.get("ending_page")
-    if sp and ep and sp != ep:
-        source += f", {html.escape(sp)}–{html.escape(ep)}"
-    elif sp:
-        source += f", {html.escape(sp)}"
 
-    note = " (in Japanese)" if "jpn" in (it.get("languages") or []) else ""
+def page_range(start, end):
+    if start and end and start != end:
+        return f"{esc(start)}–{esc(end)}"
+    return esc(start)
+
+
+def paper_parts(it):
+    title = linked(esc(pick(it.get("paper_title"))), it)
+    source = f"<i>{esc(pick(it.get('publication_name')))}</i>"
+    if it.get("volume"):
+        source += f", <i>{esc(it['volume'])}</i>"
+        if it.get("number"):
+            source += f"({esc(it['number'])})"
+    pages = page_range(it.get("starting_page"), it.get("ending_page"))
+    if pages:
+        source += f", {pages}"
+    return title, source
+
+
+def editors_of(it):
+    """Read an "Editor: ..." / "Editors: ..." line from the researchmap description (概要)."""
+    text = re.sub(r"<[^>]+>", "\n", pick(it.get("description")))
+    m = re.search(r"^\s*(Editors?)\s*:\s*(.+?)\s*$", text, re.M | re.I)
+    if not m:
+        return ""
+    label = "Eds." if m.group(1).lower() == "editors" else "Ed."
+    return f"{esc(m.group(2))} ({label}), "
+
+
+def book_parts(it):
+    book = esc(pick(it.get("book_title")))
+    chapter = esc(pick(it.get("book_owner_range")))
+    publisher = esc(pick(it.get("publisher")))
+    if chapter:
+        # A chapter: "Chapter. In Book (pp. x–y). Publisher"
+        title = linked(chapter, it)
+        source = f"In {editors_of(it)}<i>{book}</i>"
+        pages = (it.get("rep_page") or "").replace("-", "–")
+        if pages:
+            source += f" (pp. {esc(pages)})"
+    else:
+        # A whole book: "Book. Publisher"
+        title = linked(f"<i>{book}</i>", it)
+        source = ""
+    if publisher:
+        source = f"{source}. {publisher}" if source else publisher
+    return title, source
+
+
+def render_item(it):
+    authors = (it.get("authors") or {}).get("en") or (it.get("authors") or {}).get("ja") or []
     names = join_authors([a.get("name", "") for a in authors])
-    return (
-        "      <li>\n"
-        f"        {names} ({year}).\n"
-        f"        {title}.\n"
-        f"        {source}.{note}\n"
-        "      </li>\n"
-    )
+    year = year_of(it)
+    year = "in press" if year == IN_PRESS else year
+    title, source = book_parts(it) if "book_title" in it else paper_parts(it)
+    note = " (in Japanese)" if "jpn" in (it.get("languages") or []) else ""
+    lines = [f"        {names} ({year}).", f"        {title}."]
+    if source:
+        lines.append(f"        {source}.{note}")
+    elif note:
+        lines[-1] += note
+    return "      <li>\n" + "\n".join(lines) + "\n      </li>\n"
 
 
 def render(items):
-    items = sorted(items, key=lambda it: it.get("publication_date") or "", reverse=True)
+    # Newest first; items without a date (in press) go on top.
+    items = sorted(items, key=lambda it: it.get("publication_date") or "9999", reverse=True)
     out, year = [], None
     for it in items:
-        y = (it.get("publication_date") or "")[:4] or "n.d."
+        y = year_of(it)
         if y != year:
             if year is not None:
                 out.append("    </ol>\n")
@@ -103,9 +156,11 @@ def render(items):
 
 def main():
     if len(sys.argv) > 1:
-        items = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))["items"]
+        items = []
+        for path in sys.argv[1:]:
+            items += json.loads(Path(path).read_text(encoding="utf-8"))["items"]
     else:
-        items = fetch_all()
+        items = [it for t in TYPES for it in fetch_all(t)]
     if not items:
         sys.exit("No items found; leaving publications.html unchanged.")
 
