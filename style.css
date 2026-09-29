@@ -1,9 +1,9 @@
 :root {
-  /* 筑波の紫と早稲田の臙脂。リンクなどの単色は筑波の紫 */
+  /* Tsukuba purple and Waseda crimson; single-color accents (links etc.) use Tsukuba purple */
   --tsukuba: #6b3d91;
   --waseda: #8e1b2f;
   --accent: var(--tsukuba);
-  /* 名前・最上部のライン・CVボタン用のグラデーション */
+  /* Gradient for the name, the top line and the CV button */
   --gradient: linear-gradient(90deg, var(--waseda) 25%, var(--tsukuba) 75%);
 
   --bg: #fbfaf8;
@@ -33,7 +33,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ページ最上部の細いライン */
+/* Thin line at the very top of the page */
 body::before {
   content: "";
   display: block;
@@ -154,7 +154,7 @@ h2 {
   font-size: 13px;
 }
 
-/* 英語と日本語の段落：PCでは左右、スマホでは縦に並べる */
+/* English and Japanese side by side on desktop, stacked on mobile */
 .bilingual {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -274,7 +274,7 @@ h2 {
   stroke-linejoin: round;
 }
 
-/* ホバーで各サービスのブランドカラーに */
+/* Brand color of each service on hover */
 .social-scholar:hover,
 .social-scholar:focus-visible {
   color: #4285f4;
