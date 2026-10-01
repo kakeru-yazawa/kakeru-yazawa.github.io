@@ -156,8 +156,11 @@ def paper_parts(it):
         details = []
         if it.get("volume"):
             details.append(f"Vol. {esc(it['volume'])}")
-        if start:
-            prefix = "pp." if end and end != start else "p."
+        if start and not end:
+            # Start page only = paper number (e.g. ICPhS 2015), like "Article" for journals
+            details.append(f"Paper {esc(start)}")
+        elif start:
+            prefix = "pp." if end != start else "p."
             details.append(f"{prefix} {page_range(start, end)}")
         # "In" reads oddly before a Japanese title, so it is left out there
         lead = "" if has_cjk(venue) else "In "
