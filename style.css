@@ -78,6 +78,12 @@ body::before {
   list-style: none;
 }
 
+/* Arrow for links that open another site */
+.site-nav .ext {
+  margin-left: 2px;
+  font-size: 0.85em;
+}
+
 .site-nav a[aria-current="page"] {
   color: var(--text);
   text-decoration-line: underline;
