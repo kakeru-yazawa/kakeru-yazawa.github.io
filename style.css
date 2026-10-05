@@ -121,12 +121,24 @@ h1 {
   letter-spacing: 0.1em;
 }
 
+/* Line to the left of each affiliation: Tsukuba purple, Waseda crimson */
 .affiliation {
   display: flex;
   flex-direction: column;
   margin: 20px 0 0;
+  padding-left: 12px;
+  border-left: 3px solid var(--border);
   color: var(--muted);
   line-height: 1.6;
+}
+
+.affiliation-tsukuba {
+  border-left-color: var(--tsukuba);
+}
+
+.affiliation-waseda {
+  margin-top: 12px;
+  border-left-color: var(--waseda);
 }
 
 /* ---------- Sections ---------- */
