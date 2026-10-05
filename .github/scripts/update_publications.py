@@ -1,12 +1,13 @@
-"""Rebuild the publication list in publications.html from researchmap.
+"""Rebuild publications.html and projects.html from researchmap.
 
 Usage:
-  python .github/scripts/update_publications.py              # fetch from the researchmap API
-  python .github/scripts/update_publications.py a.json b.json # use saved API responses instead
+  python .github/scripts/update_publications.py            # fetch from the researchmap API
+  python .github/scripts/update_publications.py --data DIR # use saved API responses (DIR/<type>.json)
 
 Papers (published_papers) and books/chapters (books_etc) are merged and grouped by year.
 Book editors are read from an "Editor: ..." or "Editors: ..." line in the description (概要).
-Only the part of publications.html between the researchmap markers is replaced.
+Research projects (research_projects) are split into ongoing and completed.
+Only the part of each page between the researchmap markers is replaced.
 """
 
 import html
@@ -17,8 +18,7 @@ import urllib.request
 from pathlib import Path
 
 PERMALINK = "kakeruyazawa"
-TYPES = ["published_papers", "books_etc"]
-PAGE = Path(__file__).resolve().parents[2] / "publications.html"
+ROOT = Path(__file__).resolve().parents[2]
 START = "<!-- researchmap:start -->"
 END = "<!-- researchmap:end -->"
 MY_NAMES = {"Kakeru Yazawa", "Yazawa Kakeru", "矢澤 翔", "矢澤翔"}
@@ -316,23 +316,113 @@ def render(items):
     return "".join(out)
 
 
-def main():
-    if len(sys.argv) > 1:
-        items = []
-        for path in sys.argv[1:]:
-            items += json.loads(Path(path).read_text(encoding="utf-8"))["items"]
-    else:
-        items = [it for t in TYPES for it in fetch_all(t)]
-    if not items:
-        sys.exit("No items found; leaving publications.html unchanged.")
+# ---------- Research projects ----------
 
-    page = PAGE.read_text(encoding="utf-8")
+MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+SHORT_ORGS = {"Japan Society for the Promotion of Science": "JSPS"}
+ROLES = {"principal_investigator": "Principal Investigator", "coinvestigator": "Co-Investigator"}
+
+
+def month_label(ym):
+    """ "2022-04" -> "Apr 2022" """
+    year, _, month = (ym or "").partition("-")
+    return f"{MONTHS[int(month) - 1]} {year}" if month else year
+
+
+def period_of(it):
+    start, end = it.get("from_date") or "", it.get("to_date") or ""
+    if end.startswith("9999"):
+        return f"{month_label(start)} –"
+    if start == end:
+        return month_label(start)
+    return f"{month_label(start)} – {month_label(end)}"
+
+
+def is_ongoing(it, today):
+    end = it.get("to_date") or "9999"
+    return end.startswith("9999") or end >= today
+
+
+def render_project(it):
+    title_en = pick(it.get("research_project_title"))
+    title_ja = (it.get("research_project_title") or {}).get("ja") or ""
+    lines = [f'        <span class="proj-title">{esc(title_en)}</span>']
+    if has_cjk(title_ja) and title_ja != title_en:
+        lines.append(f'        <span class="proj-title-ja" lang="ja">{esc(title_ja)}</span>')
+
+    role = ROLES.get(it.get("research_project_owner_role"), "")
+    investigators = pick(it.get("investigators")) or []
+    pi = investigators[0].get("name", "") if investigators else ""
+    if role == "Co-Investigator" and pi and pi not in MY_NAMES:
+        role += f" (PI: {esc(pi)})"
+
+    org = pick(it.get("offer_organization"))
+    org = SHORT_ORGS.get(org, org)
+    scheme = pick(it.get("category")) or pick(it.get("system_name"))
+    funder = esc(scheme if scheme.startswith(org) else ", ".join(x for x in (org, scheme) if x))
+    number = ((it.get("identifiers") or {}).get("grant_number") or [""])[0]
+    kaken = [x["@id"] for x in it.get("see_also") or [] if x.get("label") == "kaken"]
+    if number:
+        num = f'<a href="{esc(kaken[0])}">{esc(number)}</a>' if kaken else esc(number)
+        funder += f" ({num})"
+
+    period = f'<span class="nowrap">{period_of(it)}</span>'
+    meta = " · ".join(x for x in (role, funder, period) if x)
+    lines.append(f'        <span class="proj-meta">{meta}</span>')
+    return "      <li>\n" + "\n".join(lines) + "\n      </li>\n"
+
+
+def render_projects(items):
+    import datetime
+    today = datetime.date.today().strftime("%Y-%m")
+    items = sorted(items, key=lambda it: it.get("from_date") or "", reverse=True)
+    out = []
+    for heading, group in (
+        ('Ongoing <span lang="ja">進行中</span>', [it for it in items if is_ongoing(it, today)]),
+        ('Completed <span lang="ja">終了</span>', [it for it in items if not is_ongoing(it, today)]),
+    ):
+        if not group:
+            continue
+        out.append(f'    <div class="pub-group">\n    <h2 class="pub-year">{heading}</h2>\n    <ul class="projects">\n')
+        out += [render_project(it) for it in group]
+        out.append("    </ul></div>\n")
+    return "".join(out)
+
+
+# ---------- Pages ----------
+
+# (page, researchmap types, renderer)
+PAGES = [
+    ("publications.html", ["published_papers", "books_etc"], render),
+    ("projects.html", ["research_projects"], render_projects),
+]
+
+
+def write_block(name, html_block):
+    path = ROOT / name
+    page = path.read_text(encoding="utf-8")
     pattern = re.compile(re.escape(START) + r".*?" + re.escape(END), re.S)
     if not pattern.search(page):
-        sys.exit("Markers not found in publications.html.")
-    block = f"{START}\n{render(items)}    {END}"
-    PAGE.write_text(pattern.sub(lambda _: block, page), encoding="utf-8")
-    print(f"Wrote {len(items)} items to {PAGE.name}")
+        sys.exit(f"Markers not found in {name}.")
+    block = f"{START}\n{html_block}    {END}"
+    path.write_text(pattern.sub(lambda _: block, page), encoding="utf-8")
+
+
+def main():
+    data_dir = None
+    if len(sys.argv) == 3 and sys.argv[1] == "--data":
+        data_dir = Path(sys.argv[2])
+    for name, types, renderer in PAGES:
+        items = []
+        for t in types:
+            if data_dir:
+                items += json.loads((data_dir / f"{t}.json").read_text(encoding="utf-8"))["items"]
+            else:
+                items += fetch_all(t)
+        if not items:
+            sys.exit(f"No items found; leaving {name} unchanged.")
+        write_block(name, renderer(items))
+        print(f"Wrote {len(items)} items to {name}")
 
 
 if __name__ == "__main__":

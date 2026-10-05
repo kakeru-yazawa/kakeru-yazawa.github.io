@@ -318,6 +318,53 @@ h2 {
   overflow-wrap: anywhere;
 }
 
+/* Research projects */
+.projects {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.projects li {
+  display: flex;
+  flex-direction: column;
+}
+
+.projects li + li {
+  margin-top: 20px;
+}
+
+.proj-title {
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.proj-title-ja {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.proj-meta {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.proj-meta .nowrap {
+  white-space: nowrap;
+}
+
+.proj-meta a {
+  color: inherit;
+  text-decoration-color: var(--border);
+}
+
+.proj-meta a:hover,
+.proj-meta a:focus-visible {
+  color: var(--accent);
+  text-decoration-color: currentColor;
+}
+
 .pub-year {
   margin: 0 0 12px;
 }
