@@ -25,63 +25,41 @@
     <p class="name-ja">研究課題</p>
   </header>
 
-  <section class="section">
-    <!-- researchmap:start -->
-    <div class="pub-group">
-    <h2 class="pub-year">Ongoing <span lang="ja">進行中</span></h2>
-    <ul class="projects">
-      <li>
-        <span class="proj-title">The relationship between phonetic features of foreign accents and social evaluation and acceptance: A comparison focusing on Japan, Europe, the US, and Australia</span>
-        <span class="proj-title-ja" lang="ja">外国語訛の音声特徴と社会的評価・許容度の関係-日欧米豪の比較を中心に</span>
-        <span class="proj-meta">Co-Investigator (PI: Mariko Kondo) · JSPS, Grant-in-Aid for Scientific Research (B) (<a href="https://kaken.nii.ac.jp/grant/KAKENHI-PROJECT-26K00146">26K00146</a>) · <span class="nowrap">Apr 2026 – Mar 2031</span></span>
-      </li>
-      <li>
-        <span class="proj-title">Brain responses to speech perception and their association with cognitive function</span>
-        <span class="proj-title-ja" lang="ja">言語音知覚の脳反応と認知機能の関連性調査</span>
-        <span class="proj-meta">Co-Investigator (PI: Yasuaki Shinohara) · JSPS, Grant-in-Aid for Scientific Research (B) (<a href="https://kaken.nii.ac.jp/grant/KAKENHI-PROJECT-26K00147">26K00147</a>) · <span class="nowrap">Apr 2026 – Mar 2030</span></span>
-      </li>
-      <li>
-        <span class="proj-title">Understanding the mastery of multiple languages and dialects</span>
-        <span class="proj-meta">Co-Investigator (PI: Paola Escudero) · Australian Research Council, Discovery Projects (DP250101453) · <span class="nowrap">Aug 2025 – Jul 2028</span></span>
-      </li>
-      <li>
-        <span class="proj-title">Building a pre- and post-study abroad speech database of Japanese speakers&#x27; English</span>
-        <span class="proj-title-ja" lang="ja">日本人留学生の縦断的英語音声データベースの構築</span>
-        <span class="proj-meta">Principal Investigator · JSPS, Grant-in-Aid for Early-Career Scientists (<a href="https://kaken.nii.ac.jp/grant/KAKENHI-PROJECT-22K13159">22K13159</a>) · <span class="nowrap">Apr 2022 – Mar 2027</span></span>
-      </li>
-    </ul></div>
-    <div class="pub-group">
-    <h2 class="pub-year">Completed <span lang="ja">終了</span></h2>
-    <ul class="projects">
-      <li>
-        <span class="proj-title">Understanding the mastery of multiple languages and dialects: Advancing computational modeling and interdisciplinary collaboration</span>
-        <span class="proj-meta">Principal Investigator · Western Sydney University, International Visiting Scholar Program · <span class="nowrap">Aug 2025</span></span>
-      </li>
-      <li>
-        <span class="proj-title">Research on the mechanisms of understanding speech in different varieties of English: Focusing on Asian and African English</span>
-        <span class="proj-title-ja" lang="ja">多様な英語の音声理解のメカニズムの研究：アジア・アフリカの英語を中心に</span>
-        <span class="proj-meta">Co-Investigator (PI: Mariko Kondo) · JSPS, Grant-in-Aid for Scientific Research (B) (<a href="https://kaken.nii.ac.jp/grant/KAKENHI-PROJECT-23K20468">23K20468</a>) · <span class="nowrap">Apr 2021 – Mar 2026</span></span>
-      </li>
-      <li>
-        <span class="proj-title">Corpus-based investigation of L1 phonetic drift and L2 proficiency</span>
-        <span class="proj-title-ja" lang="ja">大規模日英音声コーパスを用いたL1音声ドリフトとL2習熟度の関連性の解明</span>
-        <span class="proj-meta">Principal Investigator · JSPS, Grant-in-Aid for Early-Career Scientists (<a href="https://kaken.nii.ac.jp/grant/KAKENHI-PROJECT-20K13144">20K13144</a>) · <span class="nowrap">Apr 2020 – Mar 2024</span></span>
-      </li>
-      <li>
-        <span class="proj-title">L2LP-based modeling of the perception of second language and foreign-accented speech</span>
-        <span class="proj-title-ja" lang="ja">L2LPモデルに基づく外国語音声と外国語訛りの知覚に関する研究</span>
-        <span class="proj-meta">Principal Investigator · JSPS, Grant-in-Aid for JSPS Fellows (<a href="https://kaken.nii.ac.jp/grant/KAKENHI-PROJECT-18J11517">18J11517</a>) · <span class="nowrap">Apr 2018 – Mar 2019</span></span>
-      </li>
-      <li>
-        <span class="proj-title">Computational modeling of native and non-native perception of foreign-accented speech</span>
-        <span class="proj-title-ja" lang="ja">外国語訛りを伴う音声の母語話者及び非母語話者による知覚とシミュレーション</span>
-        <span class="proj-meta">Principal Investigator · JSPS Overseas Challenge Program for Young Researchers (201708171) · <span class="nowrap">Nov 2017 – Mar 2018</span></span>
-      </li>
-    </ul></div>
-    <!-- researchmap:end -->
+  <section class="section project">
+    <h2 class="project-title" lang="en">L2 speech corpus development and analysis</h2>
+    <p class="project-title-ja">第二言語音声コーパスの構築と分析</p>
+    <div class="bilingual">
+      <div lang="en">
+        <p>I develop and analyze J-AESOP, a large-scale speech corpus of Japanese learners of English. The figure below shows how learners&rsquo; English vowel quality changes with their L2 proficiency.</p>
+      </div>
+      <div>
+        <p>日本人英語学習者の大規模音声コーパスJ-AESOPを構築・分析しています。下図は、学習者の英語母音の音質がL2習熟度によってどのように変わるかを示したものです。</p>
+      </div>
+    </div>
+
+    <figure class="vowel-landscape" data-src="data/jaesop-vowels.json">
+      <div class="vl-stage">
+        <canvas aria-label="3D landscape of Japanese speakers' English vowels by L2 proficiency"></canvas>
+        <div class="vl-hint" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 3v18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12h18M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg>
+          Drag to explore in 3D
+        </div>
+      </div>
+      <div class="vl-controls">
+        <label class="vl-slider">
+          <span>Proficiency</span>
+          <input class="vl-prof" type="range" min="2" max="9" step="0.05" value="3">
+          <output class="vl-prof-value"></output>
+        </label>
+        <label class="vl-toggle"><input class="vl-native" type="checkbox"> Native English means</label>
+      </div>
+      <div class="vl-vowels" role="group" aria-label="Show or hide vowels"></div>
+      <p class="vl-status"></p>
+    </figure>
   </section>
 
   <footer class="footer">&copy; 2026 Kakeru Yazawa</footer>
 </main>
+<script src="js/vowel-landscape.js"></script>
 </body>
 </html>

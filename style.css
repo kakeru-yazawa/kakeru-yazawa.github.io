@@ -58,6 +58,7 @@ body::before {
 }
 
 .site-nav a {
+  white-space: nowrap;
   color: var(--muted);
   text-decoration: none;
   text-underline-offset: 6px;
@@ -72,7 +73,9 @@ body::before {
 
 .site-nav ul {
   display: flex;
-  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px 24px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -318,53 +321,6 @@ h2 {
   overflow-wrap: anywhere;
 }
 
-/* Research projects */
-.projects {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.projects li {
-  display: flex;
-  flex-direction: column;
-}
-
-.projects li + li {
-  margin-top: 20px;
-}
-
-.proj-title {
-  font-weight: 600;
-  line-height: 1.6;
-}
-
-.proj-title-ja {
-  font-size: 14px;
-  color: var(--muted);
-}
-
-.proj-meta {
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.proj-meta .nowrap {
-  white-space: nowrap;
-}
-
-.proj-meta a {
-  color: inherit;
-  text-decoration-color: var(--border);
-}
-
-.proj-meta a:hover,
-.proj-meta a:focus-visible {
-  color: var(--accent);
-  text-decoration-color: currentColor;
-}
-
 .pub-year {
   margin: 0 0 12px;
 }
@@ -419,6 +375,173 @@ h2 {
   font-size: 12px;
 }
 
+/* ---------- Projects ---------- */
+
+.project-title {
+  margin: 0;
+  color: var(--text);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.section .project-title-ja {
+  margin: 2px 0 20px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+/* Interactive vowel landscape (js/vowel-landscape.js) */
+.vowel-landscape {
+  margin: 28px 0 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.vl-stage {
+  position: relative;
+}
+
+.vl-stage canvas {
+  display: block;
+  width: 100%;
+  height: 480px;
+  cursor: grab;
+  touch-action: none;
+}
+
+.vl-stage canvas:active {
+  cursor: grabbing;
+}
+
+/* Hint that the chart can be dragged; fades away after the first drag */
+.vl-hint {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 8px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12px;
+  pointer-events: none;
+  transition: opacity 0.6s;
+}
+
+.vl-hint svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.vl-hint.is-hidden {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .vl-hint svg {
+    animation: vl-nudge 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes vl-nudge {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+
+.vl-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+}
+
+.vl-slider {
+  display: flex;
+  flex: 1 1 300px;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+}
+
+.vl-slider input {
+  flex: 1;
+  accent-color: var(--accent);
+}
+
+.vl-slider output {
+  min-width: 2.4em;
+  color: var(--text);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.vl-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.vl-vowels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 16px 12px;
+}
+
+.vl-vowels button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.vl-vowels button i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.vl-vowels button[aria-pressed="false"] {
+  color: var(--muted);
+  opacity: 0.45;
+}
+
+.vl-vowels button[aria-pressed="false"] i {
+  background: transparent !important;
+  box-shadow: inset 0 0 0 1.5px var(--muted);
+}
+
+.vl-status {
+  margin: 0;
+  padding: 0 16px 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 /* ---------- Footer ---------- */
 
 .footer {
@@ -444,5 +567,13 @@ h2 {
 @media (max-width: 480px) {
   .hero {
     padding: 48px 0 40px;
+  }
+
+  .vl-stage canvas {
+    height: 360px;
+  }
+
+  .site-nav ul {
+    gap: 4px 16px;
   }
 }
