@@ -175,9 +175,6 @@
       ctx.fillStyle = COLORS[v];
       ctx.fillText(LABELS[v], c.x, c.y - 6);
     });
-
-    var near = DATA.J.filter(function (r) { return r[1] === 0 && Math.abs(r[0] - p) <= BANDWIDTH; }).length;
-    status.textContent = near + " Japanese speakers within ±" + BANDWIDTH + " of proficiency " + p.toFixed(1) + ".";
   }
 
   function start(data) {

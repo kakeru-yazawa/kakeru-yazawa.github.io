@@ -542,6 +542,10 @@ h2 {
   font-size: 13px;
 }
 
+.vl-status:empty {
+  display: none;
+}
+
 /* ---------- Footer ---------- */
 
 .footer {
