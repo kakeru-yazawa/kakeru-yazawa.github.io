@@ -15,7 +15,7 @@
   var native = root.querySelector(".vl-native"), status = root.querySelector(".vl-status");
   var hint = root.querySelector(".vl-hint"), toggles = root.querySelector(".vl-vowels");
   var shown = LABELS.map(function () { return true; });
-  var yaw = 0, pitch = 0, w = 0, h = 0;   // start from directly above, like a vowel chart
+  var yaw = 0, pitch = 0.26, w = 0, h = 0;   // start almost from above (about 15°), like a vowel chart
   var DATA = null, nativeMean = [];
 
   // Weighted mean and covariance of each vowel for speakers near proficiency p
