@@ -1,6 +1,6 @@
 :root {
   /* Tsukuba purple and Waseda crimson; single-color accents (links etc.) use Tsukuba purple */
-  --tsukuba: #6b3d91;
+  --tsukuba: #7a1fa2;
   --waseda: #8e1b2f;
   --accent: var(--tsukuba);
   /* Gradient for the name and the top line */
