@@ -4,7 +4,8 @@ Usage:
   python .github/scripts/update_publications.py            # fetch from the researchmap API
   python .github/scripts/update_publications.py --data DIR # use saved API responses (DIR/<type>.json)
 
-Papers (published_papers) and books/chapters (books_etc) are merged and grouped by year.
+Papers (published_papers) and books/chapters (books_etc) are merged, grouped by year,
+and listed alphabetically by author within each year (English works first, then Japanese).
 Book editors are read from an "Editor: ..." or "Editors: ..." line in the description (概要).
 Only the part of the page between the researchmap markers is replaced.
 """
@@ -297,9 +298,18 @@ def render_item(it):
     return f'      <li data-type="{category_of(it)}"{lang}>\n' + "\n".join(lines) + "\n      </li>\n"
 
 
+def author_key(it):
+    """Order within a year: English works before Japanese ones, then APA order by the
+    authors' family names (English spelling when available), then title."""
+    authors = pick(it.get("authors")) or []
+    families = [split_name(a.get("name", ""))[1].lower() for a in authors]
+    return is_japanese(it), families, pick(it.get("paper_title") or it.get("book_title")).lower()
+
+
 def render(items):
-    # Newest first; items without a date (in press) go on top.
-    items = sorted(items, key=lambda it: it.get("publication_date") or "9999", reverse=True)
+    # Years newest first (in press on top); within each year, English then Japanese, by author.
+    items = sorted(items, key=author_key)
+    items = sorted(items, key=lambda it: year_of(it), reverse=True)
     out, year = [render_filters(items)], None
     for it in items:
         y = year_of(it)
