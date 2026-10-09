@@ -526,6 +526,27 @@ h2 {
   box-shadow: inset 0 0 0 1.5px var(--muted);
 }
 
+/* "Show all" / "Hide all": plain text buttons at the right end of the vowel toggles */
+.vl-all {
+  display: inline-flex;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.vl-vowels .vl-all button {
+  padding: 3px 6px;
+  border-color: transparent;
+  background: none;
+  color: var(--muted);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.vl-vowels .vl-all button:hover {
+  color: var(--accent);
+}
+
 .vl-status {
   margin: 0;
   padding: 0 16px 12px;

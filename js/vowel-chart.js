@@ -152,8 +152,14 @@
       return { label: l, m: average(rows, v) };
     });
 
-    // One toggle button per category
+    // One toggle button per category, then "Show all" and "Hide all" at the right
     toggles.innerHTML = "";
+    var buttons = [];
+    function setAll(on) {
+      shown = shown.map(function () { return on; });
+      buttons.forEach(function (b) { b.setAttribute("aria-pressed", on ? "true" : "false"); });
+      draw();
+    }
     LABELS.forEach(function (l, v) {
       var b = document.createElement("button");
       b.type = "button";
@@ -164,8 +170,18 @@
         b.setAttribute("aria-pressed", shown[v] ? "true" : "false");
         draw();
       });
+      buttons.push(b);
       toggles.appendChild(b);
     });
+    var group = document.createElement("span");
+    group.className = "vl-all";
+    [["Show all", true], ["Hide all", false]].forEach(function (a) {
+      var b = document.createElement("button");
+      b.type = "button"; b.textContent = a[0];
+      b.addEventListener("click", function () { setAll(a[1]); });
+      group.appendChild(b);
+    });
+    toggles.appendChild(group);
     draw();
   }
 
