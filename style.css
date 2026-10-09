@@ -424,6 +424,16 @@ h2 {
   cursor: grabbing;
 }
 
+.vowel-landscape [hidden] {
+  display: none !important;
+}
+
+/* Flat chart of means (data sets with view: "means") */
+.vl-stage .vl-means canvas {
+  cursor: default;
+  touch-action: auto;
+}
+
 /* Hint that the chart can be dragged; fades away after the first drag */
 .vl-tabs {
   position: absolute;

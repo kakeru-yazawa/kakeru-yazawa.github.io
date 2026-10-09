@@ -1,6 +1,7 @@
 // Interactive vowel landscape: J-AESOP English vowels of Japanese speakers by L2 proficiency.
 // Seen from above it is a vowel chart; tilted, each category becomes a hill (a 2D Gaussian scaled to peak at 1).
 // Optional tabs (.vl-tabs [data-set]) switch the data set while keeping the view, proficiency and pins.
+// A data set with view: "means" is shown instead as a flat chart of means and individual speakers (.vl-means).
 (function () {
   var root = document.querySelector(".vowel-landscape");
   if (!root) return;
@@ -11,8 +12,10 @@
       labels: ["iː", "ɪ", "ɛ", "æ", "ʌ", "ɑː", "ɔː", "ʊ", "uː", "ɝ"],
       colors: ["#8e1b2f", "#c2410c", "#b45309", "#4d7c0f", "#0f766e", "#0369a1", "#4338ca", "#6b3d91", "#a21caf", "#6b6870"]
     },
-    // Reduced vowels in content words: learners split by spelling, natives by reduced vowel (AH0 = ə, IH0 = ɨ)
+    // Reduced vowels in content words: learners by spelling (data J), natives as ə (AH0) and ɨ (IH0) (data N).
+    // Values are relative to each speaker's stressed-vowel centroid, so (0, 0) is the center of their vowel space.
     unstressed: {
+      view: "means",
       labels: ["⟨i⟩", "⟨e⟩", "⟨a⟩", "⟨o⟩", "⟨u⟩"],
       colors: ["#8e1b2f", "#b45309", "#4d7c0f", "#4338ca", "#a21caf"],
       nativeLabels: ["ə", "ɨ"]
@@ -22,7 +25,8 @@
   var F2R = [2.6, -2.2], F1R = [-2.0, 2.4];   // front vowels on the left, high vowels at the top
   var NX = 84, NY = 78, BANDWIDTH = 0.6;
 
-  var canvas = root.querySelector("canvas"), ctx = canvas.getContext("2d");
+  var canvas = root.querySelector(".vl-stage > canvas"), ctx = canvas.getContext("2d");
+  var meansEl = root.querySelector(".vl-means");
   var prof = root.querySelector(".vl-prof"), out = root.querySelector(".vl-prof-value");
   var native = root.querySelector(".vl-native"), status = root.querySelector(".vl-status");
   var hint = root.querySelector(".vl-hint"), toggles = root.querySelector(".vl-vowels");
@@ -31,7 +35,7 @@
   if (!tabs.length) tabs = [root];
   var shown = [];
   var yaw = 0, pitch = 0.26, w = 0, h = 0;   // start almost from above (about 15°), like a vowel chart
-  var DATA = null, nativeMean = [], nativeLabels = null, cache = {}, ready = false;
+  var DATA = null, nativeMean = [], VIEW = "3d", cache = {}, ready = false;
 
   // Weighted mean and covariance of each vowel for speakers near proficiency p
   function fit(p) {
@@ -121,6 +125,7 @@
 
   function draw() {
     if (!DATA) return;
+    if (VIEW === "means") return drawMeans();
     var p = +prof.value;
     out.textContent = p.toFixed(1);
     ctx.clearRect(0, 0, w, h);
@@ -166,13 +171,13 @@
     // Native English means: black pins at a fixed height, drawn on top so they are never buried
     if (native.checked) {
       nativeMean.forEach(function (m, v) {
-        if (!nativeLabels && !shown[v]) return;   // pins follow the toggles only when they share the categories
+        if (!shown[v]) return;
         var foot = project(world(m[0], m[1], 0)), head = project(world(m[0], m[1], 1.12));
         ctx.strokeStyle = "#1c1b1f"; ctx.lineWidth = 1.2; ctx.setLineDash([3, 3]);
         ctx.beginPath(); ctx.moveTo(foot.x, foot.y); ctx.lineTo(head.x, head.y); ctx.stroke();
         ctx.setLineDash([]);
         ctx.font = "600 13px system-ui, sans-serif";
-        var tag = (nativeLabels || LABELS)[v], tw = ctx.measureText(tag).width + 10, th = 18;
+        var tag = LABELS[v], tw = ctx.measureText(tag).width + 10, th = 18;
         ctx.fillStyle = "#1c1b1f";
         ctx.beginPath(); ctx.roundRect(head.x - tw / 2, head.y - th, tw, th, 4); ctx.fill();
         ctx.fillStyle = "#ffffff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
@@ -193,21 +198,124 @@
     });
   }
 
+  // Mean F1 and F2 of the rows ([category, F1, F2]) in category v
+  function average(rows, v) {
+    var rs = rows.filter(function (r) { return r[0] === v; });
+    return [1, 2].map(function (k) { return rs.reduce(function (s, r) { return s + r[k]; }, 0) / rs.length; });
+  }
+
+  // ---------- Flat chart of means (view: "means") ----------
+
+  var MAP = { c: meansEl && meansEl.querySelector("canvas") };
+  var natTags = [];
+  var MF2 = [2.4, -2.2], MF1 = [-2.0, 2.2];
+
+  function weight(r0, p) { return Math.exp(-Math.pow(r0 - p, 2) / (2 * BANDWIDTH * BANDWIDTH)); }
+
+  // Learners' weighted mean of category v at proficiency p
+  function meanAt(v, p) {
+    var w = 0, a = 0, b = 0;
+    DATA.J.forEach(function (r) {
+      if (r[1] !== v) return;
+      var k = weight(r[0], p); w += k; a += k * r[2]; b += k * r[3];
+    });
+    return [a / w, b / w];
+  }
+
+  function useMeans(def) {
+    natTags = def.nativeLabels.map(function (label, v) { return { label: label, m: average(DATA.N, v) }; });
+    resizeMeans();
+  }
+
+  function resizeMeans() {
+    var dpr = window.devicePixelRatio || 1;
+    MAP.w = MAP.c.clientWidth; MAP.h = MAP.c.clientHeight;
+    MAP.c.width = MAP.w * dpr; MAP.c.height = MAP.h * dpr;
+    MAP.ctx = MAP.c.getContext("2d"); MAP.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function rgba(v, a) { return "rgba(" + RGB[v].join(",") + "," + a + ")"; }
+
+  function drawMeans() {
+    var p = +prof.value;
+    out.textContent = p.toFixed(1);
+    drawMap(p);
+  }
+
+  function drawMap(p) {
+    var c = MAP.ctx, w = MAP.w, h = MAP.h;
+    // Same scale on both axes, centered; the top leaves room for the tabs
+    var k = Math.min((w - 46) / (MF2[0] - MF2[1]), (h - 80) / (MF1[1] - MF1[0]));
+    var pw = k * (MF2[0] - MF2[1]), ph = k * (MF1[1] - MF1[0]);
+    var pad = { l: (w - pw) / 2 + 11, t: 46 }; pad.r = w - pad.l - pw; pad.b = h - pad.t - ph;
+    var sx = function (f2) { return pad.l + (MF2[0] - f2) * k; };
+    var sy = function (f1) { return pad.t + (f1 - MF1[0]) * k; };
+    c.clearRect(0, 0, w, h);
+    c.strokeStyle = "#eeebef"; c.lineWidth = 1; c.fillStyle = "#6b6870"; c.font = "10px system-ui, sans-serif";
+    for (var t = -2; t <= 2; t++) {
+      c.beginPath(); c.moveTo(sx(t), pad.t); c.lineTo(sx(t), h - pad.b); c.stroke();
+      c.beginPath(); c.moveTo(pad.l, sy(t)); c.lineTo(w - pad.r, sy(t)); c.stroke();
+      c.textAlign = "center"; c.textBaseline = "top"; c.fillText(t, sx(t), h - pad.b + 4);
+      c.textAlign = "right"; c.textBaseline = "middle"; c.fillText(t, pad.l - 6, sy(t));
+    }
+    c.font = "12px system-ui, sans-serif"; c.textAlign = "center"; c.textBaseline = "top";
+    c.fillText("F2 (z)", (pad.l + w - pad.r) / 2, h - pad.b + 19);
+    c.save(); c.translate(pad.l - 26, (pad.t + h - pad.b) / 2); c.rotate(-Math.PI / 2); c.textBaseline = "middle"; c.fillText("F1 (z)", 0, 0); c.restore();
+
+    // Center of the vowel space (each speaker's stressed-vowel centroid)
+    c.strokeStyle = "#9b97a0"; c.lineWidth = 1.5;
+    c.beginPath(); c.moveTo(sx(0) - 6, sy(0)); c.lineTo(sx(0) + 6, sy(0)); c.moveTo(sx(0), sy(0) - 6); c.lineTo(sx(0), sy(0) + 6); c.stroke();
+
+    // Individual learners, fading with distance from the selected proficiency
+    c.save(); c.beginPath(); c.rect(pad.l, pad.t, w - pad.l - pad.r, h - pad.t - pad.b); c.clip();
+    DATA.J.forEach(function (r) {
+      if (!shown[r[1]]) return;
+      var k = weight(r[0], p);
+      if (k < 0.05) return;
+      c.fillStyle = rgba(r[1], 0.6 * k);
+      c.beginPath(); c.arc(sx(r[3]), sy(r[2]), 2.6, 0, Math.PI * 2); c.fill();
+    });
+    c.restore();
+
+    // Native English means: black tags
+    if (native.checked) {
+      natTags.forEach(function (n) {
+        var x = sx(n.m[1]), y = sy(n.m[0]);
+        c.font = "600 13px system-ui, sans-serif";
+        var tw = c.measureText(n.label).width + 10, th = 18;
+        c.fillStyle = "#1c1b1f";
+        c.beginPath(); c.roundRect(x - tw / 2, y - th / 2, tw, th, 4); c.fill();
+        c.fillStyle = "#ffffff"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(n.label, x, y + 1);
+      });
+    }
+
+    // Learners' means: the label itself marks the spot
+    c.font = "700 17px system-ui, sans-serif"; c.textAlign = "center"; c.textBaseline = "middle";
+    LABELS.forEach(function (label, v) {
+      if (!shown[v]) return;
+      var m = meanAt(v, p), x = sx(m[1]), y = sy(m[0]);
+      c.lineWidth = 4; c.lineJoin = "round"; c.strokeStyle = "rgba(255,255,255,0.95)"; c.strokeText(label, x, y);
+      c.fillStyle = COLORS[v]; c.fillText(label, x, y);
+    });
+  }
+
   // Switch to a data set: its categories, toggle buttons and the native means
   function use(set, data) {
     LABELS = SETS[set].labels; COLORS = SETS[set].colors;
     RGB = COLORS.map(function (c) { return [1, 3, 5].map(function (i) { return parseInt(c.substr(i, 2), 16); }); });
     DATA = data;
     shown = LABELS.map(function () { return true; });
-    // Natives can have their own categories (nativeLabels); otherwise they share the learners' ones
-    nativeLabels = SETS[set].nativeLabels || null;
-    nativeMean = (nativeLabels || LABELS).map(function (_, v) {
-      var rows = DATA.E.filter(function (r) { return r[0] === v; });
-      return [
-        rows.reduce(function (s, r) { return s + r[1]; }, 0) / rows.length,
-        rows.reduce(function (s, r) { return s + r[2]; }, 0) / rows.length
-      ];
-    });
+    nativeMean = DATA.E ? LABELS.map(function (_, v) { return average(DATA.E, v); }) : [];
+
+    // Show the 3D landscape or the flat chart of means
+    VIEW = SETS[set].view || "3d";
+    canvas.hidden = VIEW === "means";
+    if (hint) hint.hidden = VIEW === "means";
+    if (meansEl) {
+      meansEl.hidden = VIEW !== "means";
+      if (VIEW === "means") useMeans(SETS[set]);
+    }
+    if (VIEW === "3d" && ready) resize();   // the canvas may have been resized while hidden
 
     // One toggle button per category
     toggles.innerHTML = "";
@@ -260,7 +368,7 @@
 
     prof.addEventListener("input", draw);
     native.addEventListener("change", draw);
-    window.addEventListener("resize", function () { resize(); draw(); });
+    window.addEventListener("resize", function () { resize(); if (VIEW === "means") resizeMeans(); draw(); });
     resize(); draw();
   }
 
