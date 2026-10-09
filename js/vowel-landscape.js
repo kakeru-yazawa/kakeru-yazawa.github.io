@@ -10,6 +10,12 @@
     vowels: {
       labels: ["iː", "ɪ", "ɛ", "æ", "ʌ", "ɑː", "ɔː", "ʊ", "uː", "ɝ"],
       colors: ["#8e1b2f", "#c2410c", "#b45309", "#4d7c0f", "#0f766e", "#0369a1", "#4338ca", "#6b3d91", "#a21caf", "#6b6870"]
+    },
+    // Reduced vowels in content words: learners split by spelling, natives by reduced vowel (AH0 = ə, IH0 = ɨ)
+    unstressed: {
+      labels: ["⟨i⟩", "⟨e⟩", "⟨a⟩", "⟨o⟩", "⟨u⟩"],
+      colors: ["#8e1b2f", "#b45309", "#4d7c0f", "#4338ca", "#a21caf"],
+      nativeLabels: ["ə", "ɨ"]
     }
   };
   var LABELS, COLORS, RGB;
@@ -25,7 +31,7 @@
   if (!tabs.length) tabs = [root];
   var shown = [];
   var yaw = 0, pitch = 0.26, w = 0, h = 0;   // start almost from above (about 15°), like a vowel chart
-  var DATA = null, nativeMean = [], cache = {}, ready = false;
+  var DATA = null, nativeMean = [], nativeLabels = null, cache = {}, ready = false;
 
   // Weighted mean and covariance of each vowel for speakers near proficiency p
   function fit(p) {
@@ -160,17 +166,17 @@
     // Native English means: black pins at a fixed height, drawn on top so they are never buried
     if (native.checked) {
       nativeMean.forEach(function (m, v) {
-        if (!shown[v]) return;
+        if (!nativeLabels && !shown[v]) return;   // pins follow the toggles only when they share the categories
         var foot = project(world(m[0], m[1], 0)), head = project(world(m[0], m[1], 1.12));
         ctx.strokeStyle = "#1c1b1f"; ctx.lineWidth = 1.2; ctx.setLineDash([3, 3]);
         ctx.beginPath(); ctx.moveTo(foot.x, foot.y); ctx.lineTo(head.x, head.y); ctx.stroke();
         ctx.setLineDash([]);
         ctx.font = "600 13px system-ui, sans-serif";
-        var tw = ctx.measureText(LABELS[v]).width + 10, th = 18;
+        var tag = (nativeLabels || LABELS)[v], tw = ctx.measureText(tag).width + 10, th = 18;
         ctx.fillStyle = "#1c1b1f";
         ctx.beginPath(); ctx.roundRect(head.x - tw / 2, head.y - th, tw, th, 4); ctx.fill();
         ctx.fillStyle = "#ffffff"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-        ctx.fillText(LABELS[v], head.x, head.y - th / 2 + 1);
+        ctx.fillText(tag, head.x, head.y - th / 2 + 1);
       });
     }
 
@@ -193,7 +199,9 @@
     RGB = COLORS.map(function (c) { return [1, 3, 5].map(function (i) { return parseInt(c.substr(i, 2), 16); }); });
     DATA = data;
     shown = LABELS.map(function () { return true; });
-    nativeMean = LABELS.map(function (_, v) {
+    // Natives can have their own categories (nativeLabels); otherwise they share the learners' ones
+    nativeLabels = SETS[set].nativeLabels || null;
+    nativeMean = (nativeLabels || LABELS).map(function (_, v) {
       var rows = DATA.E.filter(function (r) { return r[0] === v; });
       return [
         rows.reduce(function (s, r) { return s + r[1]; }, 0) / rows.length,

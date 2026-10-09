@@ -30,15 +30,19 @@
     <p class="project-title-ja">第二言語音声コーパス</p>
     <div class="bilingual">
       <div lang="en">
-        <p>I build and analyze L2 speech corpora of Japanese learners&rsquo; English. The interactive figure below, based on data from the J&#8209;AESOP corpus, shows how the quality of stressed English vowels changes with learners&rsquo; proficiency.</p>
+        <p>I build and analyze L2 speech corpora of Japanese learners&rsquo; English. The interactive figure below, based on data from the J&#8209;AESOP corpus, shows how the quality of English vowels changes with learners&rsquo; proficiency.</p>
       </div>
       <div>
-        <p>日本人英語学習者の第二言語音声コーパスを構築・分析しています。下図は、J&#8209;AESOPコーパスのデータに基づき、英語の強勢母音の音質が学習者の習熟度によってどのように変化するかをインタラクティブに示したものです。</p>
+        <p>日本人英語学習者の第二言語音声コーパスを構築・分析しています。下図は、J&#8209;AESOPコーパスのデータに基づき、英語母音の音質が学習者の習熟度によってどのように変化するかをインタラクティブに示したものです。</p>
       </div>
     </div>
 
-    <figure class="vowel-landscape" data-set="vowels" data-src="data/jaesop-vowels.json">
+    <figure class="vowel-landscape">
       <div class="vl-stage">
+        <div class="vl-tabs" role="tablist" aria-label="Data set">
+          <button type="button" role="tab" data-set="vowels" data-src="data/jaesop-vowels.json" aria-selected="true">Stressed vowels</button>
+          <button type="button" role="tab" data-set="unstressed" data-src="data/jaesop-unstressed.json" aria-selected="false">Unstressed vowels</button>
+        </div>
         <canvas aria-label="3D landscape of Japanese speakers' English vowels by L2 proficiency"></canvas>
         <div class="vl-hint" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M12 3v18M12 3l-3 3M12 3l3 3M12 21l-3-3M12 21l3-3M3 12h18M3 12l3-3M3 12l3 3M21 12l-3-3M21 12l-3 3"/></svg>
