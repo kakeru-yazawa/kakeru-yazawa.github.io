@@ -1,22 +1,31 @@
 // Interactive vowel landscape: J-AESOP English vowels of Japanese speakers by L2 proficiency.
-// Seen from above it is a vowel chart; tilted, each vowel becomes a hill (a 2D Gaussian scaled to peak at 1).
+// Seen from above it is a vowel chart; tilted, each category becomes a hill (a 2D Gaussian scaled to peak at 1).
+// Optional tabs (.vl-tabs [data-set]) switch the data set while keeping the view, proficiency and pins.
 (function () {
   var root = document.querySelector(".vowel-landscape");
   if (!root) return;
 
-  var LABELS = ["iː", "ɪ", "ɛ", "æ", "ʌ", "ɑː", "ɔː", "ʊ", "uː", "ɝ"];
-  var COLORS = ["#8e1b2f", "#c2410c", "#b45309", "#4d7c0f", "#0f766e", "#0369a1", "#4338ca", "#6b3d91", "#a21caf", "#6b6870"];
-  var RGB = COLORS.map(function (c) { return [1, 3, 5].map(function (i) { return parseInt(c.substr(i, 2), 16); }); });
+  // Categories of each data set, in the order of the category index in the data files
+  var SETS = {
+    vowels: {
+      labels: ["iː", "ɪ", "ɛ", "æ", "ʌ", "ɑː", "ɔː", "ʊ", "uː", "ɝ"],
+      colors: ["#8e1b2f", "#c2410c", "#b45309", "#4d7c0f", "#0f766e", "#0369a1", "#4338ca", "#6b3d91", "#a21caf", "#6b6870"]
+    }
+  };
+  var LABELS, COLORS, RGB;
   var F2R = [2.6, -2.2], F1R = [-2.0, 2.4];   // front vowels on the left, high vowels at the top
-  var NX = 56, NY = 52, BANDWIDTH = 0.6;
+  var NX = 84, NY = 78, BANDWIDTH = 0.6;
 
   var canvas = root.querySelector("canvas"), ctx = canvas.getContext("2d");
   var prof = root.querySelector(".vl-prof"), out = root.querySelector(".vl-prof-value");
   var native = root.querySelector(".vl-native"), status = root.querySelector(".vl-status");
   var hint = root.querySelector(".vl-hint"), toggles = root.querySelector(".vl-vowels");
-  var shown = LABELS.map(function () { return true; });
+  // Without tabs, the figure itself names its data set (data-set, data-src)
+  var tabs = Array.prototype.slice.call(root.querySelectorAll(".vl-tabs [data-set]"));
+  if (!tabs.length) tabs = [root];
+  var shown = [];
   var yaw = 0, pitch = 0.26, w = 0, h = 0;   // start almost from above (about 15°), like a vowel chart
-  var DATA = null, nativeMean = [];
+  var DATA = null, nativeMean = [], cache = {}, ready = false;
 
   // Weighted mean and covariance of each vowel for speakers near proficiency p
   function fit(p) {
@@ -105,6 +114,7 @@
   }
 
   function draw() {
+    if (!DATA) return;
     var p = +prof.value;
     out.textContent = p.toFixed(1);
     ctx.clearRect(0, 0, w, h);
@@ -139,7 +149,7 @@
       var light = 0.55 + 0.35 * (1 - Math.min(1, q.z)) + Math.max(-0.15, Math.min(0.15, q.shade));
       var col = RGB[q.v].map(function (ch) { return Math.round(ch + (255 - ch) * Math.max(0, Math.min(1, light - 0.25))); });
       ctx.fillStyle = "rgb(" + col.join(",") + ")";
-      ctx.strokeStyle = "rgba(255,255,255,0.35)";
+      ctx.strokeStyle = "rgba(255,255,255,0.18)";
       ctx.lineWidth = 0.5;
       ctx.beginPath();
       ctx.moveTo(q.pts[0].x, q.pts[0].y);
@@ -177,8 +187,12 @@
     });
   }
 
-  function start(data) {
+  // Switch to a data set: its categories, toggle buttons and the native means
+  function use(set, data) {
+    LABELS = SETS[set].labels; COLORS = SETS[set].colors;
+    RGB = COLORS.map(function (c) { return [1, 3, 5].map(function (i) { return parseInt(c.substr(i, 2), 16); }); });
     DATA = data;
+    shown = LABELS.map(function () { return true; });
     nativeMean = LABELS.map(function (_, v) {
       var rows = DATA.E.filter(function (r) { return r[0] === v; });
       return [
@@ -187,6 +201,40 @@
       ];
     });
 
+    // One toggle button per category
+    toggles.innerHTML = "";
+    LABELS.forEach(function (label, v) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("aria-pressed", "true");
+      b.innerHTML = '<i style="background:' + COLORS[v] + '"></i>' + label;
+      b.addEventListener("click", function () {
+        shown[v] = !shown[v];
+        b.setAttribute("aria-pressed", shown[v] ? "true" : "false");
+        draw();
+      });
+      toggles.appendChild(b);
+    });
+    draw();
+  }
+
+  // Data can also be embedded (window.VOWEL_LANDSCAPE_DATA = { vowels: ... }), e.g. for offline previews
+  function load(tab) {
+    var set = tab.dataset.set, embedded = window.VOWEL_LANDSCAPE_DATA;
+    if (!cache[set]) {
+      cache[set] = embedded && embedded[set]
+        ? Promise.resolve(embedded[set])
+        : fetch(tab.dataset.src).then(function (res) { return res.json(); });
+    }
+    status.textContent = "";
+    return cache[set].then(function (data) {
+      if (tab !== root) tabs.forEach(function (t) { t.setAttribute("aria-selected", t === tab ? "true" : "false"); });
+      use(set, data);
+      if (!ready) { ready = true; start(); }
+    }).catch(function () { status.textContent = "The figure could not be loaded."; });
+  }
+
+  function start() {
     // Drag to tilt and rotate
     var dragging = false, lastX = 0, lastY = 0;
     canvas.addEventListener("pointerdown", function (e) {
@@ -202,30 +250,12 @@
     });
     canvas.addEventListener("pointerup", function () { dragging = false; });
 
-    // One toggle button per vowel
-    LABELS.forEach(function (label, v) {
-      var b = document.createElement("button");
-      b.type = "button";
-      b.setAttribute("aria-pressed", "true");
-      b.innerHTML = '<i style="background:' + COLORS[v] + '"></i>' + label;
-      b.addEventListener("click", function () {
-        shown[v] = !shown[v];
-        b.setAttribute("aria-pressed", shown[v] ? "true" : "false");
-        draw();
-      });
-      toggles.appendChild(b);
-    });
-
     prof.addEventListener("input", draw);
     native.addEventListener("change", draw);
     window.addEventListener("resize", function () { resize(); draw(); });
     resize(); draw();
   }
 
-  // Data can also be embedded (window.VOWEL_LANDSCAPE_DATA), e.g. for offline previews
-  (window.VOWEL_LANDSCAPE_DATA
-    ? Promise.resolve(window.VOWEL_LANDSCAPE_DATA)
-    : fetch(root.dataset.src).then(function (res) { return res.json(); }))
-    .then(start)
-    .catch(function () { status.textContent = "The figure could not be loaded."; });
+  tabs.forEach(function (tab) { if (tab !== root) tab.addEventListener("click", function () { load(tab); }); });
+  load(tabs[0]);
 })();
