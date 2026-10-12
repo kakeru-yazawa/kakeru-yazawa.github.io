@@ -4,6 +4,41 @@
 // Native English means are shown as black tags.
 // Diphthongs (view: "trajectory") are drawn instead as arrows from 20% through 50% to 80% of the vowel.
 // Tabs (.vl-tabs [data-set]) switch the data set while keeping the proficiency and settings.
+//
+// How the data files (data/jaesop-*.json) were made
+// --------------------------------------------------
+// Source: a J-AESOP export (not in this repository) with one row per speaker x word x vowel position:
+//   Speaker, L1 (J/E), Sex, Proficiency, Task, Vowel (ARPAbet with stress digit), Word,
+//   Position (which vowel of the word, from 1), Spelling (the letters for that vowel), N (tokens),
+//   F1_20, F2_20, F1_50, F2_50, F1_80, F2_80 (Hz, mean of the tokens at 20/50/80% of the vowel).
+//   Tasks: "6_01" (alignment checked by hand) and "1" (MFA alignment only); both are read speech.
+//   Proficiency is the mean of four ratings: segments, prosody, fluency and nativelikeness.
+// 1. Function words are left out everywhere: a, and, as, at, be, but, could, did, has, he, him, his, I, in, it, of,
+//    should, so, than, that, the, then, they, to, was, were, when, which, who. They often take weak forms
+//    ([wəz], [ðət], [əv]) even where the dictionary marks stress; natives' "was", "that" and "but" are
+//    much higher than content words with the same vowel.
+//    Each remaining row (a vowel in a word) counts once per speaker (rows are not weighted by N;
+//    some task-1 words are repeated up to 20 times and would otherwise dominate).
+// 2. z-scores per speaker and formant, from the mean and SD of the 50% values of their stressed monophthongs
+//    (IY IH EH AE AH AA AO UH UW ER with stress 1 or 2, content words, both tasks).
+//    All time points use the same mean and SD.
+// 3. Categories:
+//    - vowels: the stressed monophthongs above (50% values).
+//    - unstressed: AH0 and IH0 in content words. Learners are grouped by the Spelling column (i e a o u;
+//      "io" in information counts as o); natives by vowel (AH0 = ə, IH0 = ɨ, data N). Words with two
+//      reduced vowels (apartment, available, california) give one row per vowel, so each goes to its own
+//      spelling (e.g. the AH0 in california spelled i and the one spelled a).
+//    - diphthongs: EY AY AW OW with stress 1 or 2 (20/50/80% values).
+// 4. Exclusions:
+//    - learners' "obliged" with an onset F1 below 0 z (read as /iː/, "オブリージド"; natives are all above 0.4);
+//    - any value beyond 3.5 z;
+//    - tokens more than 3 robust SDs (1.4826 x MAD) from other speakers' values for the same word,
+//      vowel position and L1 (words with at least 10 speakers; compared within each word so phonetic
+//      environments are kept).
+// 5. Each speaker's values are averaged within each category. Speaker IDs are dropped and the rows are put in
+//    a fixed random order (sorted by a hash of the set name and speaker ID).
+//    Rows: J [proficiency, category, F1 z, F2 z] (diphthongs: 6 values, F1/F2 at 20, 50, 80%),
+//          E [category, values...] for natives in the learners' categories, N [category, F1 z, F2 z] for ə/ɨ.
 (function () {
   var root = document.querySelector(".vowel-landscape");
   if (!root) return;
@@ -26,7 +61,8 @@
     diphthongs: {
       view: "trajectory",
       labels: ["eɪ", "aɪ", "aʊ", "oʊ"],
-      colors: ["#b45309", "#8e1b2f", "#4d7c0f", "#0369a1"]
+      colors: ["#b45309", "#8e1b2f", "#4d7c0f", "#0369a1"],
+      nativeOnTop: 1   // natives' aɪ and aʊ start at the same spot; draw aɪ last so its long path stays visible
     }
   };
   var F2R = [2.4, -2.2], F1R = [-2.0, 2.2];   // front vowels on the left, high vowels at the top
@@ -38,7 +74,7 @@
   var toggles = root.querySelector(".vl-vowels");
   var tabs = Array.prototype.slice.call(root.querySelectorAll(".vl-tabs [data-set]"));
   var w = 0, h = 0, cache = {}, ready = false;
-  var DATA = null, VIEW = "", LABELS = [], COLORS = [], RGB = [], shown = [], natives = [];
+  var DATA = null, SET = "", VIEW = "", LABELS = [], COLORS = [], RGB = [], shown = [], natives = [];
 
   function weight(r0, p) { return Math.exp(-Math.pow(r0 - p, 2) / (2 * BANDWIDTH * BANDWIDTH)); }
   function rgba(v, a) { return "rgba(" + RGB[v].join(",") + "," + a + ")"; }
@@ -182,8 +218,10 @@
 
     // Native English: dashed black trajectories with a tag at the onset, independent of the toggles
     if (native.checked) {
-      natives.forEach(function (n) {
+      var top = SETS[SET].nativeOnTop;
+      natives.filter(function (n, v) { return v !== top; }).concat(top === undefined ? [] : [natives[top]]).forEach(function (n) {
         var m = points(n.m);
+        arrow(m, sx, sy, "rgba(255,255,255,0.85)", 4, null, 0);   // white edge so it reads over the line below
         arrow(m, sx, sy, "#1c1b1f", 1.8, [5, 4], 10);
         tag(n.label, sx(m[0][1]), sy(m[0][0]));
       });
@@ -199,7 +237,7 @@
   // Switch to a data set: its categories, toggle buttons and the native references
   function use(set, data) {
     var def = SETS[set];
-    LABELS = def.labels; COLORS = def.colors; DATA = data; VIEW = def.view || "";
+    LABELS = def.labels; COLORS = def.colors; DATA = data; SET = set; VIEW = def.view || "";
     RGB = COLORS.map(function (c) { return [1, 3, 5].map(function (i) { return parseInt(c.substr(i, 2), 16); }); });
     shown = LABELS.map(function () { return true; });
 
@@ -209,7 +247,7 @@
       return { label: l, m: average(rows, v) };
     });
 
-    // One toggle button per category, then "Show all" and "Hide all" at the right
+    // One toggle button per category
     toggles.innerHTML = "";
     var buttons = [];
     function setAll(on) {
@@ -230,6 +268,7 @@
       buttons.push(b);
       toggles.appendChild(b);
     });
+    // Then "Show all" / "Hide all" as plain links after the buttons
     var group = document.createElement("span");
     group.className = "vl-all";
     [["Show all", true], ["Hide all", false]].forEach(function (a) {
