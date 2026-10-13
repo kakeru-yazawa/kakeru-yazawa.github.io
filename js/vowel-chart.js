@@ -1,8 +1,9 @@
 // Interactive vowel chart: J-AESOP English vowels of Japanese speakers by L2 proficiency.
 // For the selected proficiency, each category shows the learners' mean (its label), the individual speakers
-// near that proficiency (dots fading with distance) and an ellipse covering about 68% of them.
-// Native English means are shown as black tags.
-// Diphthongs (view: "trajectory") are drawn instead as arrows from 20% through 50% to 80% of the vowel.
+// near that proficiency (dots fading with distance) and an ellipse covering about 95% of them.
+// Native English means are shown as black tags, hidden with the learners' category they belong to.
+// Diphthongs (view: "trajectory") are drawn instead as arrows from 20% through 50% to 80% of the vowel,
+// learners labelled on the 50% point, natives (black dashed) at the onset.
 // Tabs (.vl-tabs [data-set]) switch the data set while keeping the proficiency and settings.
 //
 // How the data files (data/jaesop-*.json) were made
@@ -11,23 +12,25 @@
 //   Speaker, L1 (J/E), Sex, Proficiency, Task, Vowel (ARPAbet with stress digit), Word,
 //   Position (which vowel of the word, from 1), Spelling (the letters for that vowel), N (tokens),
 //   F1_20, F2_20, F1_50, F2_50, F1_80, F2_80 (Hz, mean of the tokens at 20/50/80% of the vowel).
-//   Tasks: "6_01" (alignment checked by hand) and "1" (MFA alignment only); both are read speech.
+//   Tasks: "6_01" (alignment checked by hand), "1" and "3" (MFA alignment only); all are read speech.
 //   Proficiency is the mean of four ratings: segments, prosody, fluency and nativelikeness.
-// 1. Function words are left out everywhere: a, and, as, at, be, but, could, did, has, he, him, his, I, in, it, of,
-//    should, so, than, that, the, then, they, to, was, were, when, which, who. They often take weak forms
-//    ([wəz], [ðət], [əv]) even where the dictionary marks stress; natives' "was", "that" and "but" are
-//    much higher than content words with the same vowel.
+// 1. Function words are left out everywhere: a, an, and, any, are, as, at, be, but, by, could, did, for, has, have,
+//    he, him, his, I, in, is, it, it's, me, not, of, should, so, than, that, the, then, there, they, this, to, was,
+//    we, were, when, which, who, would, you. Natives often say them in weak forms ([wəz], [ðət], [əv]) even
+//    where the dictionary marks stress, while learners use full vowels, so with them the gap between the two
+//    would partly reflect reduction rather than vowel quality.
 //    Each remaining row (a vowel in a word) counts once per speaker (rows are not weighted by N;
 //    some task-1 words are repeated up to 20 times and would otherwise dominate).
 // 2. z-scores per speaker and formant, from the mean and SD of the 50% values of their stressed monophthongs
-//    (IY IH EH AE AH AA AO UH UW ER with stress 1 or 2, content words, both tasks).
+//    (IY IH EH AE AH AA AO UH UW ER with stress 1 or 2, content words, all tasks).
 //    All time points use the same mean and SD.
 // 3. Categories:
 //    - vowels: the stressed monophthongs above (50% values).
 //    - unstressed: AH0 and IH0 in content words. Learners are grouped by the Spelling column (i e a o u;
-//      "io" in information counts as o); natives by vowel (AH0 = ə, IH0 = ɨ, data N). Words with two
-//      reduced vowels (apartment, available, california) give one row per vowel, so each goes to its own
-//      spelling (e.g. the AH0 in california spelled i and the one spelled a).
+//      "io" in information and question counts as o, "ia" in commercial as a), natives too, so both are
+//      compared in the same words. Words with two reduced vowels (e.g. apartment, california, teresa) give
+//      one row per vowel, so each goes to its own spelling (the AH0 in california spelled i and the one
+//      spelled a).
 //    - diphthongs: EY AY AW OW with stress 1 or 2 (20/50/80% values).
 // 4. Exclusions:
 //    - learners' "obliged" with an onset F1 below 0 z (read as /iː/, "オブリージド"; natives are all above 0.4);
@@ -38,7 +41,7 @@
 // 5. Each speaker's values are averaged within each category. Speaker IDs are dropped and the rows are put in
 //    a fixed random order (sorted by a hash of the set name and speaker ID).
 //    Rows: J [proficiency, category, F1 z, F2 z] (diphthongs: 6 values, F1/F2 at 20, 50, 80%),
-//          E [category, values...] for natives in the learners' categories, N [category, F1 z, F2 z] for ə/ɨ.
+//          E [category, values...] for natives.
 (function () {
   var root = document.querySelector(".vowel-landscape");
   if (!root) return;
@@ -51,11 +54,10 @@
       labels: ["iː", "ɪ", "ɛ", "æ", "ʌ", "ɑː", "ɔː", "ʊ", "uː", "ɝ"],
       colors: ["#8e1b2f", "#c2410c", "#b45309", "#4d7c0f", "#0f766e", "#0369a1", "#4338ca", "#6b3d91", "#a21caf", "#6b6870"]
     },
-    // Reduced vowels in content words: learners by spelling; natives as ə (AH0) and ɨ (IH0).
+    // Reduced vowels (AH0, IH0) in content words, learners and natives by spelling.
     unstressed: {
       labels: ["⟨i⟩", "⟨e⟩", "⟨a⟩", "⟨o⟩", "⟨u⟩"],
-      colors: ["#8e1b2f", "#b45309", "#4d7c0f", "#4338ca", "#a21caf"],
-      nativeLabels: ["ə", "ɨ"]
+      colors: ["#8e1b2f", "#b45309", "#4d7c0f", "#4338ca", "#a21caf"]
     },
     // Rows hold F1 and F2 (z) at 20%, 50% and 80% of the vowel: J [proficiency, category, 6 values], E [category, 6 values]
     diphthongs: {
@@ -66,7 +68,7 @@
     }
   };
   var F2R = [2.4, -2.2], F1R = [-2.0, 2.2];   // front vowels on the left, high vowels at the top
-  var BANDWIDTH = 0.6, ELLIPSE = 1.51;          // 1.51 SD covers about 68% of a 2D normal distribution
+  var BANDWIDTH = 0.6, ELLIPSE = 2.45;          // 2.45 SD covers about 95% of a 2D normal distribution
 
   var canvas = root.querySelector(".vl-stage canvas"), ctx = canvas.getContext("2d");
   var prof = root.querySelector(".vl-prof"), out = root.querySelector(".vl-prof-value");
@@ -165,8 +167,8 @@
     });
     means.forEach(function (m) { label(LABELS[m.v], m.x, m.y, COLORS[m.v], "700 17px system-ui, sans-serif"); });
 
-    // Native English means: black tags on top, independent of the category toggles
-    if (native.checked) natives.forEach(function (n) { tag(n.label, sx(n.m[1]), sy(n.m[0])); });
+    // Native English means: black tags on top
+    shownNatives().forEach(function (n) { tag(n.label, sx(n.m[1]), sy(n.m[0])); });
   }
 
   function tag(text, x, y) {
@@ -206,26 +208,34 @@
     });
     ctx.restore();
 
-    // Learners' average trajectory, with the label at the onset
+    // Learners' average trajectory, with the label on its middle (50%) point (drawn over the natives' arrows)
+    var labels = [];
     acc.forEach(function (a, v) {
       if (!shown[v] || !a.w) return;
       var m = points(a.v.map(function (x) { return x / a.w; }));
       arrow(m, sx, sy, "rgba(255,255,255,0.9)", 7, null, 0);
       arrow(m, sx, sy, COLORS[v], 3.5, null, 13);
       ctx.fillStyle = COLORS[v]; ctx.beginPath(); ctx.arc(sx(m[0][1]), sy(m[0][0]), 4.5, 0, Math.PI * 2); ctx.fill();
-      label(LABELS[v], sx(m[0][1]), sy(m[0][0]) + 16, COLORS[v], "700 17px system-ui, sans-serif");
+      labels.push([LABELS[v], sx(m[1][1]), sy(m[1][0]), COLORS[v]]);
     });
 
-    // Native English: dashed black trajectories with a tag at the onset, independent of the toggles
-    if (native.checked) {
-      var top = SETS[SET].nativeOnTop;
-      natives.filter(function (n, v) { return v !== top; }).concat(top === undefined ? [] : [natives[top]]).forEach(function (n) {
-        var m = points(n.m);
-        arrow(m, sx, sy, "rgba(255,255,255,0.85)", 4, null, 0);   // white edge so it reads over the line below
-        arrow(m, sx, sy, "#1c1b1f", 1.8, [5, 4], 10);
-        tag(n.label, sx(m[0][1]), sy(m[0][0]));
-      });
-    }
+    // Native English: black dashed trajectories with a tag at the onset (on top of everything)
+    var top = SETS[SET].nativeOnTop;
+    var ns = shownNatives().filter(function (n) { return n.v !== top; }).concat(shownNatives().filter(function (n) { return n.v === top; }));
+    ns.forEach(function (n) {
+      var m = points(n.m);
+      arrow(m, sx, sy, "rgba(255,255,255,0.85)", 4, null, 0);   // white edge so it reads over the line below
+      arrow(m, sx, sy, "#1c1b1f", 1.8, [5, 4], 10);
+    });
+    labels.forEach(function (l) { label(l[0], l[1], l[2], l[3], "700 17px system-ui, sans-serif"); });
+    ns.forEach(function (n) { tag(n.label, sx(n.m[1]), sy(n.m[0])); });
+  }
+
+  // Natives to draw: those in the learners' categories follow the category toggles; natives' own categories
+  // (ə, ɨ) have no learner counterpart and are always shown
+  function shownNatives() {
+    if (!native.checked) return [];
+    return natives.filter(function (n) { return n.own || shown[n.v]; });
   }
 
   // Mean of the values after the category in the rows ([category, ...values]) of category v
@@ -244,7 +254,7 @@
     // Natives have their own categories (nativeLabels, data N) or share the learners' ones (data E)
     var rows = def.nativeLabels ? DATA.N : DATA.E;
     natives = (def.nativeLabels || LABELS).map(function (l, v) {
-      return { label: l, m: average(rows, v) };
+      return { label: l, m: average(rows, v), v: v, own: !!def.nativeLabels };
     });
 
     // One toggle button per category
