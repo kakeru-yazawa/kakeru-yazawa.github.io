@@ -17,9 +17,8 @@
 //   Tasks: "6_01" (English, alignment checked by hand), "1" and "3" (English, MFA alignment only) and
 //   "6_02" (Japanese, MFA only); all are read speech.
 //   Proficiency is the mean of four ratings: segments, prosody, fluency and nativelikeness.
-// 0. Tokens of 30 ms or less are left out: 30 ms is the shortest segment MFA gives, and these tokens are
-//    three times as often far from other speakers' values for the same word (16% vs 5%); tokens of 31-39 ms
-//    are as good as longer ones. The tokens of each speaker x task x word x vowel position are averaged.
+// 0. All tokens are used, whatever their duration. The tokens of each speaker x task x word x vowel position
+//    are averaged.
 // 1. Function words are left out everywhere: a, an, and, any, are, as, at, be, but, by, could, did, for, has, have,
 //    he, him, his, I, in, is, it, it's, me, not, of, should, so, than, that, the, then, there, they, this, to, was,
 //    we, were, when, which, who, would, you. Natives often say them in weak forms ([wəz], [ðət], [əv]) even
