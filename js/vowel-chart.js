@@ -2,18 +2,24 @@
 // For the selected proficiency, each category shows the learners' mean (its label), the individual speakers
 // near that proficiency (dots fading with distance) and an ellipse covering about 95% of them.
 // Native English means are shown as black tags, hidden with the learners' category they belong to.
+// The learners' own Japanese vowels (あ い う え お, in the same z space) can be shown as white tags.
 // Diphthongs (view: "trajectory") are drawn instead as arrows from 20% through 50% to 80% of the vowel,
 // learners labelled on the 50% point, natives (black dashed) at the onset.
 // Tabs (.vl-tabs [data-set]) switch the data set while keeping the proficiency and settings.
 //
 // How the data files (data/jaesop-*.json) were made
 // --------------------------------------------------
-// Source: a J-AESOP export (not in this repository) with one row per speaker x word x vowel position:
-//   Speaker, L1 (J/E), Sex, Proficiency, Task, Vowel (ARPAbet with stress digit), Word,
-//   Position (which vowel of the word, from 1), Spelling (the letters for that vowel), N (tokens),
-//   F1_20, F2_20, F1_50, F2_50, F1_80, F2_80 (Hz, mean of the tokens at 20/50/80% of the vowel).
-//   Tasks: "6_01" (alignment checked by hand), "1" and "3" (MFA alignment only); all are read speech.
+// Source: a J-AESOP export (not in this repository) with one row per vowel token:
+//   Speaker, L1 (J/E), Sex, Proficiency, Task, File, Start, End, Duration (ms),
+//   Vowel (ARPAbet with stress digit; Japanese: a i u e o with ' for accent and H for length), Word,
+//   Position (which vowel of the word, from 1), Spelling (the letters for that vowel; English only),
+//   F1_20, F2_20, F1_50, F2_50, F1_80, F2_80 (Hz, at 20/50/80% of the vowel).
+//   Tasks: "6_01" (English, alignment checked by hand), "1" and "3" (English, MFA alignment only) and
+//   "6_02" (Japanese, MFA only); all are read speech.
 //   Proficiency is the mean of four ratings: segments, prosody, fluency and nativelikeness.
+// 0. Tokens of 30 ms or less are left out: 30 ms is the shortest segment MFA gives, and these tokens are
+//    three times as often far from other speakers' values for the same word (16% vs 5%); tokens of 31-39 ms
+//    are as good as longer ones. The tokens of each speaker x task x word x vowel position are averaged.
 // 1. Function words are left out everywhere: a, an, and, any, are, as, at, be, but, by, could, did, for, has, have,
 //    he, him, his, I, in, is, it, it's, me, not, of, should, so, than, that, the, then, there, they, this, to, was,
 //    we, were, when, which, who, would, you. Natives often say them in weak forms ([wəz], [ðət], [əv]) even
@@ -22,8 +28,9 @@
 //    Each remaining row (a vowel in a word) counts once per speaker (rows are not weighted by N;
 //    some task-1 words are repeated up to 20 times and would otherwise dominate).
 // 2. z-scores per speaker and formant, from the mean and SD of the 50% values of their stressed monophthongs
-//    (IY IH EH AE AH AA AO UH UW ER with stress 1 or 2, content words, all tasks).
-//    All time points use the same mean and SD.
+//    (IY IH EH AE AH AA AO UH UW ER with stress 1 or 2, content words, English tasks).
+//    All time points, and the speaker's Japanese vowels, use the same mean and SD, so the Japanese vowels
+//    sit in the same space as that speaker's English ones.
 // 3. Categories:
 //    - vowels: the stressed monophthongs above (50% values).
 //    - unstressed: AH0 and IH0 in content words. Learners are grouped by the Spelling column (i e a o u;
@@ -32,6 +39,9 @@
 //      one row per vowel, so each goes to its own spelling (the AH0 in california spelled i and the one
 //      spelled a).
 //    - diphthongs: EY AY AW OW with stress 1 or 2 (20/50/80% values).
+//    - japanese: a i u e o (short or long, accented or not; 50% values). Word positions measured for fewer
+//      than 80% of the learners are left out: mostly high vowels between voiceless consonants, which are
+//      often devoiced (e.g. the i of kitakaze, the u of kuQtsuke), and misread words.
 // 4. Exclusions:
 //    - learners' "obliged" with an onset F1 below 0 z (read as /iː/, "オブリージド"; natives are all above 0.4);
 //    - any value beyond 3.5 z;
@@ -73,6 +83,7 @@
   var canvas = root.querySelector(".vl-stage canvas"), ctx = canvas.getContext("2d");
   var prof = root.querySelector(".vl-prof"), out = root.querySelector(".vl-prof-value");
   var native = root.querySelector(".vl-native"), status = root.querySelector(".vl-status");
+  var japanese = root.querySelector(".vl-japanese"), JP = null, JP_LABELS = ["あ", "い", "う", "え", "お"];
   var toggles = root.querySelector(".vl-vowels");
   var tabs = Array.prototype.slice.call(root.querySelectorAll(".vl-tabs [data-set]"));
   var w = 0, h = 0, cache = {}, ready = false;
@@ -166,9 +177,29 @@
       means.push({ v: v, x: sx(g.m2), y: sy(g.m1) });
     });
     means.forEach(function (m) { label(LABELS[m.v], m.x, m.y, COLORS[m.v], "700 17px system-ui, sans-serif"); });
+    drawJapanese(p, sx, sy);
 
     // Native English means: black tags on top
     shownNatives().forEach(function (n) { tag(n.label, sx(n.m[1]), sy(n.m[0])); });
+  }
+
+  // Learners' Japanese vowels near this proficiency (weighted means): white tags
+  function drawJapanese(p, sx, sy) {
+    if (!japanese.checked || !JP) return;
+    JP_LABELS.forEach(function (l, v) {
+      var sw = 0, m1 = 0, m2 = 0;
+      JP.J.forEach(function (r) {
+        if (r[1] !== v) return;
+        var wt = weight(r[0], p); sw += wt; m1 += wt * r[2]; m2 += wt * r[3];
+      });
+      if (!sw) return;
+      var x = sx(m2 / sw), y = sy(m1 / sw);
+      ctx.font = "600 13px system-ui, sans-serif";
+      var tw = ctx.measureText(l).width + 10, th = 20;
+      ctx.fillStyle = "rgba(255,255,255,0.9)"; ctx.strokeStyle = "#1c1b1f"; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.roundRect(x - tw / 2, y - th / 2, tw, th, 10); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = "#1c1b1f"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(l, x, y + 1);
+    });
   }
 
   function tag(text, x, y) {
@@ -228,6 +259,7 @@
       arrow(m, sx, sy, "#1c1b1f", 1.8, [5, 4], 10);
     });
     labels.forEach(function (l) { label(l[0], l[1], l[2], l[3], "700 17px system-ui, sans-serif"); });
+    drawJapanese(p, sx, sy);
     ns.forEach(function (n) { tag(n.label, sx(n.m[1]), sy(n.m[0])); });
   }
 
@@ -310,6 +342,14 @@
   tabs.forEach(function (tab) { tab.addEventListener("click", function () { load(tab); }); });
   prof.addEventListener("input", draw);
   native.addEventListener("change", draw);
+  // The Japanese vowels are loaded the first time they are switched on
+  japanese.addEventListener("change", function () {
+    if (JP || !japanese.checked) return draw();
+    var embedded = window.VOWEL_LANDSCAPE_DATA;
+    (embedded && embedded.japanese ? Promise.resolve(embedded.japanese) : fetch(japanese.dataset.src).then(function (res) { return res.json(); }))
+      .then(function (data) { JP = data; draw(); })
+      .catch(function () { status.textContent = "The Japanese vowels could not be loaded."; });
+  });
   window.addEventListener("resize", function () { resize(); draw(); });
   load(tabs[0]);
 })();
