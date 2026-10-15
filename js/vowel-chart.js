@@ -4,7 +4,7 @@
 // Native English means are shown as black tags, hidden with the learners' category they belong to.
 // The learners' own Japanese vowels (あ い う え お, in the same z space) can be shown as white tags.
 // Diphthongs (view: "trajectory") are drawn instead as arrows from 20% through 50% to 80% of the vowel,
-// learners labelled on the 50% point, natives (black dashed) at the onset.
+// starting at a dot and labelled on the 50% point (natives: thin black dashed arrows).
 // Tabs (.vl-tabs [data-set]) switch the data set while keeping the proficiency and settings.
 //
 // How the data files (data/jaesop-*.json) were made
@@ -14,14 +14,14 @@
 //   Vowel (ARPAbet with stress digit; Japanese: a i u e o with ' for accent and H for length), Word,
 //   Position (which vowel of the word, from 1), Spelling (the letters for that vowel; English only),
 //   F1_20, F2_20, F1_50, F2_50, F1_80, F2_80 (Hz, at 20/50/80% of the vowel).
-//   Tasks: "6_01" (English, alignment checked by hand), "1" and "3" (English, MFA alignment only) and
+//   Tasks: "6_01" (English, alignment checked by hand), "1", "3" and "5" (English, MFA alignment only) and
 //   "6_02" (Japanese, MFA only); all are read speech.
 //   Proficiency is the mean of four ratings: segments, prosody, fluency and nativelikeness.
 // 0. All tokens are used, whatever their duration. The tokens of each speaker x task x word x vowel position
 //    are averaged.
-// 1. Function words are left out everywhere: a, an, and, any, are, as, at, be, but, by, could, did, for, has, have,
-//    he, him, his, I, in, is, it, it's, me, not, of, should, so, than, that, the, then, there, they, this, to, was,
-//    we, were, when, which, who, would, you. Natives often say them in weak forms ([wəz], [ðət], [əv]) even
+// 1. Function words are left out everywhere: a, after, an, and, any, are, as, at, be, but, by, could, did, doesn't,
+//    everyone, for, has, have, he, he's, him, his, I, I'll, in, is, isn't, it, it's, me, not, of, she, should, so,
+//    than, that, the, then, there, they, this, to, until, was, we, we'll, were, when, which, who, will, would, you. Natives often say them in weak forms ([wəz], [ðət], [əv]) even
 //    where the dictionary marks stress, while learners use full vowels, so with them the gap between the two
 //    would partly reflect reduction rather than vowel quality.
 //    Each remaining row (a vowel in a word) counts once per speaker (rows are not weighted by N;
@@ -37,7 +37,7 @@
 //      compared in the same words. Words with two reduced vowels (e.g. apartment, california, teresa) give
 //      one row per vowel, so each goes to its own spelling (the AH0 in california spelled i and the one
 //      spelled a).
-//    - diphthongs: EY AY AW OW with stress 1 or 2 (20/50/80% values).
+//    - diphthongs: EY AY AW OW OY with stress 1 or 2 (20/50/80% values; OY only in "boy").
 //    - japanese: a i u e o (short or long, accented or not; 50% values). Word positions measured for fewer
 //      than 80% of the learners are left out: mostly high vowels between voiceless consonants, which are
 //      often devoiced (e.g. the i of kitakaze, the u of kuQtsuke), and misread words.
@@ -71,8 +71,8 @@
     // Rows hold F1 and F2 (z) at 20%, 50% and 80% of the vowel: J [proficiency, category, 6 values], E [category, 6 values]
     diphthongs: {
       view: "trajectory",
-      labels: ["eɪ", "aɪ", "aʊ", "oʊ"],
-      colors: ["#b45309", "#8e1b2f", "#4d7c0f", "#0369a1"],
+      labels: ["eɪ", "aɪ", "aʊ", "oʊ", "ɔɪ"],
+      colors: ["#b45309", "#8e1b2f", "#4d7c0f", "#0369a1", "#6b3d91"],
       nativeOnTop: 1   // natives' aɪ and aʊ start at the same spot; draw aɪ last so its long path stays visible
     }
   };
@@ -249,17 +249,20 @@
       labels.push([LABELS[v], sx(m[1][1]), sy(m[1][0]), COLORS[v]]);
     });
 
-    // Native English: black dashed trajectories with a tag at the onset (on top of everything)
+    // Native English: thin, light dashed trajectories with a dot at the onset, so overlapping ones stay readable
     var top = SETS[SET].nativeOnTop;
     var ns = shownNatives().filter(function (n) { return n.v !== top; }).concat(shownNatives().filter(function (n) { return n.v === top; }));
     ns.forEach(function (n) {
       var m = points(n.m);
-      arrow(m, sx, sy, "rgba(255,255,255,0.85)", 4, null, 0);   // white edge so it reads over the line below
-      arrow(m, sx, sy, "#1c1b1f", 1.8, [5, 4], 10);
+      arrow(m, sx, sy, "rgba(255,255,255,0.7)", 3.5, null, 0);   // white edge so it reads over the line below
+      arrow(m, sx, sy, "rgba(28,27,31,0.65)", 1.3, [5, 4], 9);
+      ctx.fillStyle = "#1c1b1f"; ctx.beginPath(); ctx.arc(sx(m[0][1]), sy(m[0][0]), 3, 0, Math.PI * 2); ctx.fill();   // onset
     });
     labels.forEach(function (l) { label(l[0], l[1], l[2], l[3], "700 17px system-ui, sans-serif"); });
     drawJapanese(p, sx, sy);
-    ns.forEach(function (n) { tag(n.label, sx(n.m[1]), sy(n.m[0])); });
+
+    // Natives' tags at their middle (50%) point, like the learners' labels
+    ns.forEach(function (n) { tag(n.label, sx(n.m[3]), sy(n.m[2])); });
   }
 
   // Natives to draw: those in the learners' categories follow the category toggles; natives' own categories

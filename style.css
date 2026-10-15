@@ -481,6 +481,12 @@ h2 {
   font-variant-numeric: tabular-nums;
 }
 
+.vl-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .vl-toggle {
   display: flex;
   align-items: center;
