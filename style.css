@@ -399,6 +399,18 @@ h2 {
   font-style: italic;
 }
 
+.project-figure {
+  margin: 28px 0 0;
+}
+
+.project-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
 /* Interactive vowel chart (js/vowel-chart.js) */
 .vowel-landscape {
   margin: 28px 0 0;
