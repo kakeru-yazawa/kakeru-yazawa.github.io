@@ -501,20 +501,21 @@ h2 {
 }
 
 .apa-scale {
-  padding: 24px 36px 12px;
+  padding: 16px 40px 12px;
 }
 
 .apa-axis {
   position: relative;
-  height: 112px;
+  height: 132px;
 }
 
+/* Learners' labels alternate above and below the line (.apa-low) so close ones do not collide */
 .apa-axis::before {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  top: 76px;
+  top: 64px;
   height: 4px;
   border-radius: 2px;
   background: var(--gradient);
@@ -523,7 +524,7 @@ h2 {
 
 .apa-mark {
   position: absolute;
-  top: 61px;
+  top: 49px;
   margin-left: -17px;
 }
 
@@ -550,13 +551,70 @@ h2 {
   font-variant-numeric: tabular-nums;
 }
 
+.apa-mark.apa-low .apa-dist {
+  top: 38px;
+  bottom: auto;
+}
+
+.apa-mark.apa-low .apa-name {
+  top: 58px;
+  bottom: auto;
+}
+
+/* Unit ticks on the line; the ends are numbered */
 .apa-tick {
   position: absolute;
-  top: 98px;
-  transform: translateX(-50%);
+  top: 60px;
+  width: 2px;
+  height: 12px;
+  margin-left: -1px;
+  background: var(--border);
+}
+
+.apa-end {
+  position: absolute;
+  top: 58px;
   color: var(--muted);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
+}
+
+.apa-end-lo {
+  right: calc(100% + 8px);
+}
+
+.apa-end-hi {
+  left: calc(100% + 8px);
+}
+
+@media (max-width: 640px) {
+  .apa-scale {
+    padding-inline: 28px;
+  }
+
+  .apa-mark {
+    top: 52px;
+    width: 28px;
+    height: 28px;
+    margin-left: -14px;
+  }
+
+  .apa-mark .apa-name {
+    bottom: 52px;
+    font-size: 12px;
+  }
+
+  .apa-mark .apa-dist {
+    bottom: 33px;
+  }
+
+  .apa-mark.apa-low .apa-dist {
+    top: 33px;
+  }
+
+  .apa-mark.apa-low .apa-name {
+    top: 52px;
+  }
 }
 
 .apa-scale-label {
