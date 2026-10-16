@@ -411,6 +411,169 @@ h2 {
   border-radius: 12px;
 }
 
+/* Pronunciation assessment demo (js/apa-demo.js): the reference above, the learners as play buttons on one
+   distance scale */
+.apa-demo {
+  margin: 28px 0 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.apa-ref {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px 6px;
+  background: #faf9fb;
+}
+
+.apa-ref .apa-name {
+  font-weight: 700;
+}
+
+.apa-ref-label {
+  margin-left: 6px;
+  color: var(--waseda);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Round play/pause button; the icon is drawn with CSS */
+.apa-play {
+  position: relative;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--c, var(--accent));
+  color: #ffffff;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+
+/* The reference is crimson, the start of the site gradient; the learners take the gradient's color at their
+   place on the scale (set as --c in the HTML) */
+.apa-ref .apa-play {
+  --c: var(--waseda);
+}
+
+.apa-play::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -6px 0 0 -3px;
+  border-style: solid;
+  border-width: 6px 0 6px 10px;
+  border-color: transparent transparent transparent currentColor;
+}
+
+.apa-play.playing {
+  box-shadow: 0 0 0 4px var(--surface), 0 0 0 6px var(--c, var(--accent));
+}
+
+.apa-play.playing::before {
+  width: 10px;
+  height: 12px;
+  margin: -6px 0 0 -5px;
+  border-width: 0 3px;
+  border-color: currentColor;
+}
+
+.apa-play:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.apa-passage {
+  margin: 0;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: #faf9fb;
+  color: var(--muted);
+  font-size: 13px;
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.apa-scale {
+  padding: 24px 36px 12px;
+}
+
+.apa-axis {
+  position: relative;
+  height: 112px;
+}
+
+.apa-axis::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 76px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--gradient);
+  opacity: 0.5;
+}
+
+.apa-mark {
+  position: absolute;
+  top: 61px;
+  margin-left: -17px;
+}
+
+.apa-mark .apa-name,
+.apa-mark .apa-dist {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--text);
+  font: inherit;
+  white-space: nowrap;
+}
+
+.apa-mark .apa-name {
+  bottom: 58px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.apa-mark .apa-dist {
+  bottom: 38px;
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.apa-tick {
+  position: absolute;
+  top: 98px;
+  transform: translateX(-50%);
+  color: var(--muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.apa-scale-label {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+.apa-demo figcaption {
+  padding: 10px 16px 12px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 /* Interactive vowel chart (js/vowel-chart.js) */
 .vowel-landscape {
   margin: 28px 0 0;
