@@ -544,32 +544,6 @@ h2 {
   white-space: nowrap;
 }
 
-/* Unit ticks on the line; the ends are numbered */
-.apa-tick {
-  position: absolute;
-  top: 42px;
-  width: 2px;
-  height: 12px;
-  margin-left: -1px;
-  background: var(--border);
-}
-
-.apa-end {
-  position: absolute;
-  top: 40px;
-  color: var(--muted);
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
-}
-
-.apa-end-lo {
-  right: calc(100% + 8px);
-}
-
-.apa-end-hi {
-  left: calc(100% + 8px);
-}
-
 @media (max-width: 640px) {
   .apa-scale {
     padding-inline: 28px;
@@ -590,13 +564,6 @@ h2 {
     bottom: 33px;
     font-size: 14px;
   }
-}
-
-.apa-scale-label {
-  margin: 4px 0 0;
-  color: var(--muted);
-  font-size: 12px;
-  text-align: center;
 }
 
 .apa-demo figcaption {
