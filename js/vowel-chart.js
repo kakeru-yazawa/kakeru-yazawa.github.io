@@ -2,7 +2,7 @@
 // For the selected proficiency, each category shows the learners' mean (its label), the individual speakers
 // near that proficiency (dots fading with distance) and an ellipse covering about 95% of them.
 // Native English means are shown as black tags, hidden with the learners' category they belong to.
-// The learners' own Japanese vowels (あ い う え お, in the same z space) can be shown as white tags.
+// The learners' own Japanese vowels (a i u e o, in the same z space) can be shown as white tags, the reverse of the natives'.
 // Diphthongs (view: "trajectory") are drawn instead as arrows from 20% through 50% to 80% of the vowel,
 // starting at a dot and labelled on the 50% point (natives: thin black dashed arrows).
 // Tabs (.vl-tabs [data-set]) switch the data set while keeping the proficiency and settings.
@@ -82,7 +82,7 @@
   var canvas = root.querySelector(".vl-stage canvas"), ctx = canvas.getContext("2d");
   var prof = root.querySelector(".vl-prof"), out = root.querySelector(".vl-prof-value");
   var native = root.querySelector(".vl-native"), status = root.querySelector(".vl-status");
-  var japanese = root.querySelector(".vl-japanese"), JP = null, JP_LABELS = ["あ", "い", "う", "え", "お"];
+  var japanese = root.querySelector(".vl-japanese"), JP = null, JP_LABELS = ["a", "i", "u", "e", "o"];
   var toggles = root.querySelector(".vl-vowels");
   var tabs = Array.prototype.slice.call(root.querySelectorAll(".vl-tabs [data-set]"));
   var w = 0, h = 0, cache = {}, ready = false;
@@ -194,9 +194,9 @@
       if (!sw) return;
       var x = sx(m2 / sw), y = sy(m1 / sw);
       ctx.font = "600 13px system-ui, sans-serif";
-      var tw = ctx.measureText(l).width + 10, th = 20;
-      ctx.fillStyle = "rgba(255,255,255,0.9)"; ctx.strokeStyle = "#1c1b1f"; ctx.lineWidth = 1.5;
-      ctx.beginPath(); ctx.roundRect(x - tw / 2, y - th / 2, tw, th, 10); ctx.fill(); ctx.stroke();
+      var tw = ctx.measureText(l).width + 10, th = 18;   // the natives' tag shape, in white with black text
+      ctx.fillStyle = "#ffffff"; ctx.strokeStyle = "#1c1b1f"; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.roundRect(x - tw / 2, y - th / 2, tw, th, 4); ctx.fill(); ctx.stroke();
       ctx.fillStyle = "#1c1b1f"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(l, x, y + 1);
     });
   }
