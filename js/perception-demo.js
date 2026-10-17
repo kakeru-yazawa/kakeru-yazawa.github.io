@@ -2,6 +2,23 @@
 // from data/csj-vowel-network.json. Clicking the vowel chart on the left sets the input (F1, F2 as speaker-wise
 // z-scores); the network on the right shows every unit's actual value and which vowel is perceived.
 // Network: 2 inputs -> 8 tanh -> 8 tanh -> 5 softmax (outputs in the data file's order: a i u e o).
+//
+// How the network (data/csj-vowel-network.json) was trained
+// ----------------------------------------------------------
+// Source: a CSJ export (not in this repository) with one row per vowel token:
+//   File (speaker), Gender, Vowel (a i u e o), Start, End, Duration (s), F1, F2 (Hz).
+//   566,841 tokens from 201 speakers.
+// 1. Per speaker, F1 and F2 are z-scored over all of that speaker's vowels; tokens beyond 3.5 z are dropped.
+// 2. Measurement errors: tokens more than 3 robust SDs (1.4826 x MAD) from the median of the same speaker's
+//    same vowel, in F1 or F2, are dropped (4.4% of tokens).
+// 3. Speakers are split at random (seed 3): 21 for testing, 180 for training. 60,000 training tokens are
+//    sampled at random, so the vowels keep their natural frequencies (a > o > e > i > u); 5,000 test tokens
+//    are sampled from the test speakers.
+// 4. Training: weights start as Gaussian random numbers scaled by 1/sqrt(inputs) (fixed seed 5), biases at 0.
+//    Cross-entropy loss, minibatch gradient descent (32 tokens), 30 epochs, learning rate falling linearly
+//    from 0.1 to 0.005. Weights and biases are saved rounded to 3 decimals.
+//    Accuracy on the test speakers: 81.5% (a 92%, i 72%, u 54%, e 81%, o 86%; u is mostly confused with o and e).
+// 5. "tokens" in the file: 1,200 test tokens [F1 z, F2 z, vowel] drawn as the dots on the vowel chart.
 (function () {
   var root = document.querySelector(".nn-demo");
   if (!root) return;
