@@ -75,15 +75,18 @@
     <p class="project-title-ja">音声知覚シミュレーション</p>
     <div class="bilingual">
       <div lang="en">
-        <p>I also work on simulating human speech perception. The figure below shows a simulation of Japanese listeners&rsquo; vowel perception based on a constraint-based phonological grammar. An interactive demo based on neural networks is coming soon.</p>
+        <p>Another line of my research is computational modeling of human speech perception. The demo below shows a neural network that has learned Japanese vowels from the Corpus of Spontaneous Japanese: click and drag the vowel chart to see how the network perceives that sound.</p>
       </div>
       <div>
-        <p>人間の音声知覚のシミュレーションにも取り組んでいます。下図は制約音韻文法に基づく日本語母語話者の母音知覚のシミュレーション結果です。ニューラルネットワークを用いたインタラクティブなデモも近日公開予定です。</p>
+        <p>人間の音声知覚のモデル化も研究テーマの1つです。下のデモは日本語話し言葉コーパス（CSJ）の母音を学習したニューラルネットワークで、母音図をクリックまたはドラッグすると、その音がどの母音として知覚されるかを確認できます。</p>
       </div>
     </div>
 
-    <figure class="project-figure">
-      <img src="images/perception-harmonic-grammar.webp" width="2000" height="1429" loading="lazy" alt="Simulated vowel perception of Japanese listeners by a featural Harmonic Grammar: the F1-F2 space (z) divided into categories such as /high, front/, /mid, back/ and /low, central/">
+    <figure class="nn-demo" lang="en" data-src="data/csj-vowel-network.json">
+      <div class="nn-panes">
+        <canvas class="nn-map" aria-label="Vowel chart: click to choose the F1 and F2 given to the network"></canvas>
+        <canvas class="nn-net" aria-label="The network's units and their values for the chosen F1 and F2"></canvas>
+      </div>
     </figure>
   </section>
 
@@ -140,5 +143,6 @@
 </main>
 <script src="js/vowel-chart.js"></script>
 <script src="js/apa-demo.js"></script>
+<script src="js/perception-demo.js"></script>
 </body>
 </html>

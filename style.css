@@ -399,16 +399,45 @@ h2 {
   font-style: italic;
 }
 
-.project-figure {
+/* Neural-network perception demo (js/perception-demo.js): vowel chart on the left, the network on the right */
+.nn-demo {
   margin: 28px 0 0;
-}
-
-.project-figure img {
-  display: block;
-  width: 100%;
-  height: auto;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
+  overflow: hidden;
+}
+
+.nn-panes {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 8px;
+  padding: 14px 12px;
+}
+
+.nn-panes canvas {
+  display: block;
+  width: 100%;
+  height: 310px;
+}
+
+.nn-map {
+  cursor: crosshair;
+  touch-action: none;
+}
+
+@media (max-width: 640px) {
+  .nn-panes {
+    grid-template-columns: 1fr;
+  }
+
+  .nn-map {
+    height: 290px !important;
+  }
+
+  .nn-net {
+    height: 300px !important;
+  }
 }
 
 /* Pronunciation assessment demo (js/apa-demo.js): the reference above, the learners as play buttons on one
