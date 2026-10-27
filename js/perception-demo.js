@@ -269,7 +269,7 @@
     });
     // Layer names on the left
     nctx.font = "11px system-ui, sans-serif"; nctx.fillStyle = "#6b6870"; nctx.textAlign = "left"; nctx.textBaseline = "middle";
-    ["Input", "Hidden 1", "Hidden 2", "Vowel"].forEach(function (t, c) { nctx.fillText(t, 2, N.units[c][0].y); });
+    ["Input", "Hidden 1", "Hidden 2", "Output"].forEach(function (t, c) { nctx.fillText(t, 2, N.units[c][0].y); });
   }
 
   // ---- interaction ----
