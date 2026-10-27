@@ -73,6 +73,7 @@
       view: "trajectory",
       labels: ["eɪ", "aɪ", "aʊ", "oʊ", "ɔɪ"],
       colors: ["#b45309", "#8e1b2f", "#4d7c0f", "#0369a1", "#6b3d91"],
+      order: [0, 1, 4, 2, 3],   // buttons grouped by glide direction: eɪ aɪ ɔɪ (to ɪ), aʊ oʊ (to ʊ)
       nativeOnTop: 1   // natives' aɪ and aʊ start at the same spot; draw aɪ last so its long path stays visible
     }
   };
@@ -299,8 +300,8 @@
       buttons.forEach(function (b) { b.setAttribute("aria-pressed", on ? "true" : "false"); });
       draw();
     }
-    LABELS.forEach(function (l, v) {
-      var b = document.createElement("button");
+    (def.order || LABELS.map(function (_, v) { return v; })).forEach(function (v) {
+      var l = LABELS[v], b = document.createElement("button");
       b.type = "button";
       b.setAttribute("aria-pressed", "true");
       b.innerHTML = '<i style="background:' + COLORS[v] + '"></i>' + l;
