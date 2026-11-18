@@ -293,6 +293,15 @@ h2 {
   }
 }
 
+/* Touch screens: opened by a first tap (js/book-shelf.js) */
+.book.open .book-cover {
+  transform: rotateY(-100deg);
+}
+
+.book-shelf li:has(.book.open) {
+  z-index: 2;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .book-cover {
     transition: none;
