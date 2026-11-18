@@ -195,9 +195,11 @@ h2 {
   text-transform: none;
 }
 
+/* Four slots spread across the column, 130px covers at most; a fourth book fills the last slot */
 .book-shelf {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 130px));
+  justify-content: space-between;
   gap: 28px;
   margin: 0;
   padding: 0;
@@ -205,50 +207,112 @@ h2 {
 }
 
 .book-shelf li {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: min(130px, calc((100% - 56px) / 3));   /* three covers per row, 130px wide at most */
 }
 
-.book-shelf a {
-  display: block;
-}
-
-.book-shelf img {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 2 / 3;   /* the covers differ by about 2%; same height keeps the captions level */
-  object-fit: cover;
-  border-radius: 3px;
-  box-shadow: 0 1px 2px rgba(28, 27, 31, 0.18), 0 8px 20px rgba(28, 27, 31, 0.12);
-}
-
-/* A typographic stand-in for a cover: the site gradient and the title */
-.book-shelf a.book-tile {
+/* Each book is a link holding an inner page (the citation) under a cover.
+   On devices that can hover, the cover swings open to the left like a real book;
+   on touch screens the cover simply stays shut and a tap follows the link. */
+.book-shelf .book {
   position: relative;
-  display: flex;
-  align-items: flex-end;
+  display: block;
   aspect-ratio: 2 / 3;
-  padding: 12px 11px;
-  overflow: hidden;
-  border-radius: 3px;
-  background: linear-gradient(160deg, var(--waseda), var(--tsukuba));
-  box-shadow: 0 1px 2px rgba(28, 27, 31, 0.18), 0 8px 20px rgba(28, 27, 31, 0.12);
-  color: #ffffff;
+  perspective: 800px;
+  color: var(--text);
   text-decoration: none;
 }
 
-.book-shelf a.book-tile span {
-  position: relative;
-  color: inherit;
+.book-page {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 11px;
+  overflow: hidden;
+  border-radius: 2px 3px 3px 2px;
+  background: #fffdf8;
+  box-shadow: inset 7px 0 9px -7px rgba(28, 27, 31, 0.28), 0 1px 2px rgba(28, 27, 31, 0.18), 0 8px 20px rgba(28, 27, 31, 0.12);
+  font-family: Georgia, "Times New Roman", "Hiragino Mincho ProN", serif;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.book-page .bp-title {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.book-cover {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.3, 0.7, 0.25, 1);
+}
+
+.book-cover img,
+.book-tile-title {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(28, 27, 31, 0.18), 0 8px 20px rgba(28, 27, 31, 0.12);
+  backface-visibility: hidden;
+}
+
+.book-cover img {
+  object-fit: cover;   /* the covers differ by about 2%; same height keeps the captions level */
+}
+
+/* The inside of the cover, seen once it has swung open */
+.book-back {
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  background: #ece6db;
+  box-shadow: inset -7px 0 9px -7px rgba(28, 27, 31, 0.3);
+  transform: rotateY(180deg);
+  backface-visibility: hidden;
+}
+
+/* A typographic stand-in for a cover: the site gradient and the title */
+.book-tile-title {
+  display: flex;
+  align-items: flex-end;
+  padding: 12px 11px;
+  background: linear-gradient(160deg, var(--waseda), var(--tsukuba));
+  color: #ffffff;
   font-size: 14px;
   font-weight: 700;
   line-height: 1.25;
 }
 
-.book-shelf span {
+@media (hover: hover) {
+  .book-shelf li:hover,
+  .book-shelf li:focus-within {
+    z-index: 2;
+  }
+
+  .book:hover .book-cover,
+  .book:focus-visible .book-cover {
+    transform: rotateY(-100deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .book-cover {
+    transition: none;
+  }
+}
+
+.book-shelf li > span {
   color: var(--muted);
   font-size: 12px;
 }
@@ -860,18 +924,12 @@ h2 {
 
 @media (max-width: 480px) {
   .book-shelf {
+    grid-template-columns: repeat(3, 1fr);
     gap: 16px;
   }
 
-  .book-shelf li {
-    width: calc((100% - 32px) / 3);
-  }
-
-  .book-shelf a.book-tile {
+  .book-tile-title {
     padding: 10px 8px;
-  }
-
-  .book-shelf a.book-tile span {
     font-size: 12px;
   }
 
@@ -889,11 +947,8 @@ h2 {
 }
 
 @media (max-width: 360px) {
-  .book-shelf a.book-tile {
+  .book-tile-title {
     padding: 8px 6px;
-  }
-
-  .book-shelf a.book-tile span {
     font-size: 10.5px;
   }
 }
