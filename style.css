@@ -188,6 +188,71 @@ h2 {
   border-left: 1px solid var(--border);
 }
 
+/* Book covers of recent chapters */
+.section h2 .ja {
+  margin-left: 6px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.book-shelf {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.book-shelf li {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(130px, calc((100% - 56px) / 3));   /* three covers per row, 130px wide at most */
+}
+
+.book-shelf a {
+  display: block;
+}
+
+.book-shelf img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;   /* the covers differ by about 2%; same height keeps the captions level */
+  object-fit: cover;
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(28, 27, 31, 0.18), 0 8px 20px rgba(28, 27, 31, 0.12);
+}
+
+/* A typographic stand-in for a cover: the site gradient and the title */
+.book-shelf a.book-tile {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  aspect-ratio: 2 / 3;
+  padding: 12px 11px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: linear-gradient(160deg, var(--waseda), var(--tsukuba));
+  box-shadow: 0 1px 2px rgba(28, 27, 31, 0.18), 0 8px 20px rgba(28, 27, 31, 0.12);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.book-shelf a.book-tile span {
+  position: relative;
+  color: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.book-shelf span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .contact {
   display: flex;
   align-items: center;
@@ -794,6 +859,22 @@ h2 {
 }
 
 @media (max-width: 480px) {
+  .book-shelf {
+    gap: 16px;
+  }
+
+  .book-shelf li {
+    width: calc((100% - 32px) / 3);
+  }
+
+  .book-shelf a.book-tile {
+    padding: 10px 8px;
+  }
+
+  .book-shelf a.book-tile span {
+    font-size: 12px;
+  }
+
   .hero {
     padding: 48px 0 40px;
   }
@@ -804,5 +885,15 @@ h2 {
 
   .site-nav ul {
     gap: 4px 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  .book-shelf a.book-tile {
+    padding: 8px 6px;
+  }
+
+  .book-shelf a.book-tile span {
+    font-size: 10.5px;
   }
 }
